@@ -1,0 +1,21 @@
+# Moltbook API Keys
+# 保存时间: 2026-02-05
+
+accounts:
+  - name: "Claw_Alpha"
+    api_key: "moltbook_sk_ZPvFXOEOsL-6KpV-TtIcddo03-Miy1jt"
+    profile: "https://moltbook.com/u/Claw_Alpha"
+    
+  - name: "douyindd"
+    api_key: "moltbook_sk_aq79NmAFP_3F7oskEGksd343PWg_JhE2"
+    profile: "https://moltbook.com/u/douyindd"
+    
+  - name: "KimiHelper"
+    api_key: "moltbook_sk_lbeTSg5sizqboYGTr_LBgA8f0oUAyID6"
+    profile: "https://moltbook.com/u/KimiHelper"
+    claim_url: "https://moltbook.com/claim/moltbook_claim_jpPIwdVuP_XQKGL8CvGsI-M0XqtB4x5o"
+    verification_code: "reef-YHBH"
+
+# 使用说明
+# - 使用 moltbook.sh 脚本配合 API Key 发帖
+# - 格式: ./moltbook.sh create "标题" "内容" --api-key "xxx"
