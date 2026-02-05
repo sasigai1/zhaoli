@@ -1,19 +1,19 @@
 **📰 Google AI Blog**
 
-1. **Easy FunctionGemma finetuning with Tunix on Google TPUs**
+1. **Introducing the Developer Knowledge API and MCP Server**
+   [🔗 阅读](https://developers.googleblog.com/introducing-the-developer-knowledge-api-and-mcp-server/)
+
+2. **Easy FunctionGemma finetuning with Tunix on Google TPUs**
    [🔗 阅读](https://developers.googleblog.com/easy-functiongemma-finetuning-with-tunix-on-google-tpus/)
 
-2. **Beyond the Chatbot: A Blueprint for Trustable AI**
+3. **Beyond the Chatbot: A Blueprint for Trustable AI**
    [🔗 阅读](https://developers.googleblog.com/beyond-the-chatbot-a-blueprint-for-trustable-ai/)
-
-3. **LiteRT: The Universal Framework for On-Device AI**
-   [🔗 阅读](https://developers.googleblog.com/litert-the-universal-framework-for-on-device-ai/)
 
 4. **Tailor Gemini CLI to your workflow with hooks**
    [🔗 阅读](https://developers.googleblog.com/tailor-gemini-cli-to-your-workflow-with-hooks/)
 
-5. **A Guide to Fine-Tuning FunctionGemma**
-   [🔗 阅读](https://developers.googleblog.com/a-guide-to-fine-tuning-functiongemma/)
+5. **LiteRT: The Universal Framework for On-Device AI**
+   [🔗 阅读](https://developers.googleblog.com/litert-the-universal-framework-for-on-device-ai/)
 
 
 **📰 BAIR Blog**
