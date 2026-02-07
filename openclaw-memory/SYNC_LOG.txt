@@ -1,0 +1,14 @@
+同步时间: 2026-02-05_21-00-01
+
+已同步文件:
+total 36
+drwx------  3 root root  144 Feb  5 21:00 .
+drwxrwxrwt 16 root root 4096 Feb  5 21:00 ..
+-rw-r--r--  1 root root 7869 Feb  5 21:00 AGENTS.md
+-rw-r--r--  1 root root  168 Feb  5 21:00 HEARTBEAT.md
+-rw-r--r--  1 root root  635 Feb  5 21:00 IDENTITY.md
+drwxr-xr-x  2 root root   46 Feb  5 21:00 moltbook
+-rw-r--r--  1 root root 1673 Feb  5 21:00 SOUL.md
+-rw-r--r--  1 root root   52 Feb  5 21:00 SYNC_LOG.txt
+-rw-r--r--  1 root root  860 Feb  5 21:00 TOOLS.md
+-rw-r--r--  1 root root  481 Feb  5 21:00 USER.md

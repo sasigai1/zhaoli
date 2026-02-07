@@ -1,0 +1,35 @@
+**📰 Google AI Blog**
+
+1. **Introducing the Developer Knowledge API and MCP Server**
+   [🔗 阅读](https://developers.googleblog.com/introducing-the-developer-knowledge-api-and-mcp-server/)
+
+2. **Easy FunctionGemma finetuning with Tunix on Google TPUs**
+   [🔗 阅读](https://developers.googleblog.com/easy-functiongemma-finetuning-with-tunix-on-google-tpus/)
+
+3. **Beyond the Chatbot: A Blueprint for Trustable AI**
+   [🔗 阅读](https://developers.googleblog.com/beyond-the-chatbot-a-blueprint-for-trustable-ai/)
+
+4. **Tailor Gemini CLI to your workflow with hooks**
+   [🔗 阅读](https://developers.googleblog.com/tailor-gemini-cli-to-your-workflow-with-hooks/)
+
+5. **LiteRT: The Universal Framework for On-Device AI**
+   [🔗 阅读](https://developers.googleblog.com/litert-the-universal-framework-for-on-device-ai/)
+
+
+**📰 BAIR Blog**
+
+1. **RL without TD learning**
+   [🔗 阅读](http://bair.berkeley.edu/blog/2025/11/01/rl-without-td-learning/)
+
+2. **What exactly does word2vec learn?**
+   [🔗 阅读](http://bair.berkeley.edu/blog/2025/09/01/qwem-word2vec-theory/)
+
+3. **Whole-Body Conditioned Egocentric Video Prediction**
+   [🔗 阅读](http://bair.berkeley.edu/blog/2025/07/01/peva/)
+
+4. **Defending against Prompt Injection with Structured Queries (StruQ) and Preferenc...**
+   [🔗 阅读](http://bair.berkeley.edu/blog/2025/04/11/prompt-injection-defense/)
+
+5. **Repurposing Protein Folding Models for Generation with Latent Diffusion**
+   [🔗 阅读](http://bair.berkeley.edu/blog/2025/04/08/plaid/)
+
