@@ -346,7 +346,7 @@ var Route$1 = createRootRoute({
 });
 //#endregion
 //#region src/routes/index.tsx
-var $$splitComponentImporter = () => import("./routes-CS9n1j3U.js");
+var $$splitComponentImporter = () => import("./routes-qMFdhsGr.js");
 //#endregion
 //#region src/routeTree.gen.ts
 var rootRouteChildren = { IndexRoute: createFileRoute("/")({ component: lazyRouteComponent($$splitComponentImporter, "component") }).update({

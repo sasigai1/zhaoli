@@ -4,10 +4,40 @@ import { Composer } from "@/components/composer";
 import { FrameworkTree } from "@/components/framework-tree";
 import { SessionDrawer } from "@/components/session-drawer";
 import { SpineStrip } from "@/components/spine-strip";
+import { appendFromEntry, createBlankSession } from "@/lib/heuristic";
 import { organizeThoughts } from "@/lib/organize";
 import { activeSession, useLilu } from "@/lib/store";
+import type { Session } from "@/lib/types";
 import { flattenPreorder, buildForest } from "@/lib/tree";
 import { cn } from "@/lib/utils";
+
+/* 离线 APK（Capacitor WebView）里没有服务端，organizeThoughts 会永远挂起。
+ * 检测到原生环境时改用本地启发式整理（与 addUtterance 的增量逻辑同一套）。 */
+function isNativeApp(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    typeof (window as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor
+      ?.isNativePlatform === "function" &&
+    window.Capacitor.isNativePlatform()
+  );
+}
+
+function reorganizeLocally(target: Session): {
+  title: string;
+  spine: string;
+  nodes: Session["nodes"];
+  edges: Session["edges"];
+} {
+  let rebuilt = createBlankSession();
+  rebuilt.title = target.title;
+  for (const entry of target.entries) rebuilt = appendFromEntry(rebuilt, entry);
+  return {
+    title: rebuilt.title,
+    spine: rebuilt.spine,
+    nodes: rebuilt.nodes,
+    edges: rebuilt.edges,
+  };
+}
 
 export function AppHome() {
   const sessions = useLilu((s) => s.sessions);
@@ -39,6 +69,12 @@ export function AppHome() {
 
   const refine = async (target: NonNullable<typeof session>) => {
     useLilu.getState().setOrganizing(true);
+    if (isNativeApp()) {
+      // 离线 App：本地启发式整理，立即完成，不会卡住
+      const local = reorganizeLocally(target);
+      useLilu.getState().applyOrganize(local);
+      return;
+    }
     try {
       const result = await organizeThoughts({
         data: {

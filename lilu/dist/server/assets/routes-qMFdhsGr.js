@@ -398,23 +398,6 @@ function SpineStrip({ nodes, selectedId, organizing, onJump }) {
 	});
 }
 //#endregion
-//#region node_modules/@tanstack/start-server-core/dist/esm/createSsrRpc.js
-var createSsrRpc = (functionId) => {
-	const url = "/_serverFn/" + functionId;
-	const serverFnMeta = { id: functionId };
-	const fn = async (...args) => {
-		return (await getServerFnById(functionId, { origin: "server" }))(...args);
-	};
-	return Object.assign(fn, {
-		url,
-		serverFnMeta,
-		[TSS_SERVER_FUNCTION]: true
-	});
-};
-//#endregion
-//#region src/lib/organize.ts
-var organizeThoughts = createServerFn({ method: "POST" }).validator((input) => input).handler(createSsrRpc("f7efc3551147c5883d381298d1619fc731b8a4f278b28bd51b830a342e97bed5"));
-//#endregion
 //#region src/lib/heuristic.ts
 function splitClauses(text) {
 	return text.split(/\n+|(?<=[。！？；;!?])\s*/).map((s) => s.trim()).filter((s) => s.length > 1);
@@ -552,6 +535,23 @@ function createBlankSession() {
 		spine: ""
 	};
 }
+//#endregion
+//#region node_modules/@tanstack/start-server-core/dist/esm/createSsrRpc.js
+var createSsrRpc = (functionId) => {
+	const url = "/_serverFn/" + functionId;
+	const serverFnMeta = { id: functionId };
+	const fn = async (...args) => {
+		return (await getServerFnById(functionId, { origin: "server" }))(...args);
+	};
+	return Object.assign(fn, {
+		url,
+		serverFnMeta,
+		[TSS_SERVER_FUNCTION]: true
+	});
+};
+//#endregion
+//#region src/lib/organize.ts
+var organizeThoughts = createServerFn({ method: "POST" }).validator((input) => input).handler(createSsrRpc("f7efc3551147c5883d381298d1619fc731b8a4f278b28bd51b830a342e97bed5"));
 //#endregion
 //#region src/lib/sample.ts
 var T = Date.parse("2026-08-31T22:18:00+08:00");
@@ -852,6 +852,20 @@ function activeSession(state) {
 }
 //#endregion
 //#region src/components/app-home.tsx
+function isNativeApp() {
+	return typeof window !== "undefined" && typeof window.Capacitor?.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
+}
+function reorganizeLocally(target) {
+	let rebuilt = createBlankSession();
+	rebuilt.title = target.title;
+	for (const entry of target.entries) rebuilt = appendFromEntry(rebuilt, entry);
+	return {
+		title: rebuilt.title,
+		spine: rebuilt.spine,
+		nodes: rebuilt.nodes,
+		edges: rebuilt.edges
+	};
+}
 function AppHome() {
 	const sessions = useLilu((s) => s.sessions);
 	const activeId = useLilu((s) => s.activeId);
@@ -877,6 +891,11 @@ function AppHome() {
 	}, [session]);
 	const refine = async (target) => {
 		useLilu.getState().setOrganizing(true);
+		if (isNativeApp()) {
+			const local = reorganizeLocally(target);
+			useLilu.getState().applyOrganize(local);
+			return;
+		}
 		try {
 			const result = await organizeThoughts({ data: {
 				title: target.title,
