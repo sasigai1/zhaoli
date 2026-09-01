@@ -63,29 +63,55 @@
     return '<section class="card empty"><i data-lucide="' + icon + '"></i><p>' + text + '</p></section>';
   }
 
+  /* ---------- 日内单条记录（时间线行） ---------- */
+  function entryHtml(en) {
+    var tagsHtml = en.tags.map(function (t) { return '<span class="mini-tag">' + esc(t) + '</span>'; }).join('');
+    return '<div class="dtl-row">' +
+      '<span class="dtl-time">' + esc(en.time) + '</span>' +
+      '<div class="dtl-main">' +
+        '<p class="dtl-text">' + esc(en.text) + '</p>' +
+        (tagsHtml ? '<span class="chips-inline">' + tagsHtml + '</span>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
   /* ---------- 时间线 / 搜索结果共用行 ---------- */
   function dayRow(e, showMonth) {
-    var tagsHtml = e.tags.map(function (t) { return '<span class="mini-tag">' + esc(t) + '</span>'; }).join('');
-    var thumb = e.photo ? '<img class="tl-thumb" src="' + e.photo + '" alt="当天的照片">' : '';
+    var tagSet = {};
+    e.entries.forEach(function (en) {
+      en.tags.forEach(function (t) { tagSet[t] = 1; });
+    });
+    var tagsHtml = Object.keys(tagSet).map(function (t) { return '<span class="mini-tag">' + esc(t) + '</span>'; }).join('');
+    var moodHtml = e.mood
+      ? '<span class="tl-mood"><i data-lucide="' + MOODS[e.mood].icon + '"></i>' + MOODS[e.mood].label + '</span>'
+      : '<span class="tl-mood"><i data-lucide="feather"></i>共 ' + e.entries.length + ' 条</span>';
     var dayNum = showMonth ? e.date.slice(5).replace('-', '.') : String(+e.date.slice(8));
     return '<button class="tl-row" data-day="' + e.date + '">' +
       '<span class="tl-d"><b class="' + (showMonth ? 'sm' : '') + '">' + dayNum + '</b><i>周' + weekday(e.date) + '</i></span>' +
       '<span class="tl-body">' +
-        '<span class="tl-mood"><i data-lucide="' + MOODS[e.mood].icon + '"></i>' + MOODS[e.mood].label + '</span>' +
-        '<span class="tl-text">' + esc(e.text) + '</span>' +
-        '<span class="tl-tags">' + tagsHtml + '</span>' +
-      '</span>' + thumb + '</button>';
+        moodHtml +
+        '<span class="tl-text">' + esc(e.entries[0].text) + '</span>' +
+        (tagsHtml ? '<span class="tl-tags">' + tagsHtml + '</span>' : '') +
+      '</span></button>';
   }
 
   /* ---------- 今日 ---------- */
   function renderToday() {
     var t = new Date();
+    var day = DB.getDay(DB.todayStr);
+    var tlHtml = '';
+    if (day) {
+      tlHtml =
+      '<p class="group-label">今日时间线</p>' +
+      '<section class="card"><div class="dtl">' + day.entries.map(entryHtml).join('') + '</div></section>';
+    }
     var html =
       '<section class="hero">' +
         '<p class="hero-ym">' + t.getFullYear() + ' 年 ' + (t.getMonth() + 1) + ' 月</p>' +
         '<h2 class="hero-date">' + pad(t.getMonth() + 1) + '<em>.</em>' + pad(t.getDate()) + '</h2>' +
         '<p class="hero-sub">周' + WEEK[t.getDay()] + ' · 记录的第 ' + DB.dayIndex() + ' 天</p>' +
       '</section>' +
+      tlHtml +
       '<section class="card">' +
         '<h3 class="card-label">今日心情</h3>' +
         '<div class="moods">' + MOODS.slice(1).map(function (m, i) {
@@ -101,14 +127,10 @@
         }).join('') + '</div>' +
       '</section>' +
       '<section class="card">' +
-        '<h3 class="card-label">记录</h3>' +
-        '<textarea class="ta" id="ta" placeholder="今天发生了什么……">' + esc(state.draft.text) + '</textarea>' +
+        '<h3 class="card-label">记一条</h3>' +
+        '<textarea class="ta" id="ta" placeholder="此刻发生了什么……">' + esc(state.draft.text) + '</textarea>' +
       '</section>' +
-      '<section class="card">' +
-        '<h3 class="card-label">照片</h3>' +
-        '<button class="photo-add" id="photo-add"><i data-lucide="camera"></i><span>添加一张照片</span></button>' +
-      '</section>' +
-      '<button class="btn btn-primary" id="save-btn"><i data-lucide="check"></i>保存今日记录</button>';
+      '<button class="btn btn-primary" id="save-btn"><i data-lucide="check"></i>添加到今日时间线</button>';
 
     root.innerHTML = html;
     icons();
@@ -125,8 +147,17 @@
       });
     });
     $('#ta').addEventListener('input', function () { state.draft.text = this.value; });
-    $('#photo-add').addEventListener('click', function () { toast('原型演示：照片上传为 stub'); });
-    $('#save-btn').addEventListener('click', function () { toast('已记录 · 原型演示'); });
+    $('#save-btn').addEventListener('click', function () {
+      var text = state.draft.text.trim();
+      if (!text) { toast('先写点什么吧'); return; }
+      var now = new Date();
+      DB.setMood(state.draft.mood);
+      DB.addEntry(text, state.draft.tags, pad(now.getHours()) + ':' + pad(now.getMinutes()));
+      state.draft.text = '';
+      state.draft.tags = [];
+      toast('已记录');
+      render();
+    });
   }
 
   /* ---------- 日历（月历 / 时间线） ---------- */
@@ -213,6 +244,11 @@
   /* ---------- 统计 ---------- */
   function renderStats() {
     var s = DB.getStats();
+    if (!s.total) {
+      root.innerHTML = emptyState('chart-column', '还没有统计数据，先去记录今天吧');
+      icons();
+      return;
+    }
     var moodMax = Math.max.apply(null, s.moodDist);
     var moodRows = s.moodDist.map(function (c, i) {
       var pct = moodMax ? Math.round(c / moodMax * 100) : 0;
@@ -237,7 +273,7 @@
         '<div class="kpi card"><span class="kpi-l"><i data-lucide="calendar-check"></i>累计记录</span><span class="kpi-v">' + s.total + '<em>天</em></span></div>' +
         '<div class="kpi card"><span class="kpi-l"><i data-lucide="flame"></i>连续记录</span><span class="kpi-v">' + s.streak + '<em>天</em></span></div>' +
         '<div class="kpi card"><span class="kpi-l"><i data-lucide="target"></i>本月完成</span><span class="kpi-v">' + s.monthRate + '<em>%</em></span></div>' +
-        '<div class="kpi card"><span class="kpi-l"><i data-lucide="image"></i>记录照片</span><span class="kpi-v">' + s.photos + '<em>张</em></span></div>' +
+        '<div class="kpi card"><span class="kpi-l"><i data-lucide="list"></i>记录条目</span><span class="kpi-v">' + s.entries + '<em>条</em></span></div>' +
       '</section>' +
       '<p class="group-label">心情分布</p>' +
       '<section class="card">' + moodRows + '</section>' +
@@ -316,16 +352,15 @@
         '<div class="hero">' +
           '<p class="hero-ym">' + p[0] + ' 年 ' + (+p[1]) + ' 月</p>' +
           '<h2 class="hero-date">' + p[1] + '<em>.</em>' + p[2] + '</h2>' +
-          '<p class="hero-sub">周' + weekday(ds) + ' · ' + esc(e.weather) + '</p>' +
+          '<p class="hero-sub">周' + weekday(ds) + ' · 共 ' + e.entries.length + ' 条记录</p>' +
         '</div>' +
-        '<section class="card day-meta">' +
-          '<span class="day-mood"><i data-lucide="' + MOODS[e.mood].icon + '"></i>' + MOODS[e.mood].label + '</span>' +
-          '<span class="chips-inline">' + e.tags.map(function (t) {
-            return '<span class="mini-tag">' + esc(t) + '</span>';
-          }).join('') + '</span>' +
-        '</section>' +
-        (e.photo ? '<img class="day-photo" src="' + e.photo + '" alt="当天的照片">' : '') +
-        '<section class="card"><p class="day-text">' + esc(e.text) + '</p></section>';
+        (e.mood
+          ? '<section class="card day-meta">' +
+              '<span class="day-mood"><i data-lucide="' + MOODS[e.mood].icon + '"></i>' + MOODS[e.mood].label + '</span>' +
+            '</section>'
+          : '') +
+        '<p class="group-label">这一天</p>' +
+        '<section class="card"><div class="dtl">' + e.entries.map(entryHtml).join('') + '</div></section>';
     } else {
       inner =
         '<div class="hero">' +
@@ -365,6 +400,7 @@
 
     var t = new Date();
     $('#date-badge').textContent = cnDate(fmt(t)) + ' 周' + WEEK[t.getDay()];
+    $('#sb-time').textContent = pad(t.getHours()) + ':' + pad(t.getMinutes());
 
     $('#fab').addEventListener('click', function () {
       phone.dataset.menu = phone.dataset.menu === 'open' ? 'closed' : 'open';
