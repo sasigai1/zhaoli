@@ -275,7 +275,7 @@ function PreviewHostBridge() {
 }
 //#endregion
 //#region src/styles.css?url
-var styles_default = "/assets/styles-Bgv1KIDG.css";
+var styles_default = "/assets/styles-BQDYzn6q.css";
 //#endregion
 //#region src/routes/__root.tsx
 var APP_NAME = "理路";
@@ -346,7 +346,7 @@ var Route$1 = createRootRoute({
 });
 //#endregion
 //#region src/routes/index.tsx
-var $$splitComponentImporter = () => import("./routes-qMFdhsGr.js");
+var $$splitComponentImporter = () => import("./routes-E3dJJltQ.js");
 //#endregion
 //#region src/routeTree.gen.ts
 var rootRouteChildren = { IndexRoute: createFileRoute("/")({ component: lazyRouteComponent($$splitComponentImporter, "component") }).update({

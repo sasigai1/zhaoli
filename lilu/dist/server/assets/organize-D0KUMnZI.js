@@ -11,46 +11,7 @@ var createServerRpc = (serverFnMeta, splitImportFn) => {
 };
 //#endregion
 //#region src/lib/organize.ts?tss-serverfn-split
-var organizeThoughts_createServerFn_handler = createServerRpc({
-	id: "f7efc3551147c5883d381298d1619fc731b8a4f278b28bd51b830a342e97bed5",
-	name: "organizeThoughts",
-	filename: "src/lib/organize.ts"
-}, (opts) => organizeThoughts.__executeServer(opts));
-var organizeThoughts = createServerFn({ method: "POST" }).validator((input) => input).handler(organizeThoughts_createServerFn_handler, async ({ data }) => {
-	const apiKey = process.env["XAI_API_KEY"];
-	if (!apiKey) return {
-		ok: false,
-		error: "unavailable"
-	};
-	const compact = {
-		title: data.title,
-		spine: data.spine,
-		entries: data.entries.slice(-24).map((e) => ({
-			id: e.id,
-			text: e.text.slice(0, 800)
-		})),
-		nodes: data.nodes.slice(0, 64).map(({ id, kind, text, sourceIds }) => ({
-			id,
-			kind,
-			text,
-			sourceIds
-		})),
-		edges: data.edges.slice(0, 80)
-	};
-	const res = await fetch("https://api.x.ai/v1/chat/completions", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${apiKey}`
-		},
-		body: JSON.stringify({
-			model: "grok-4.5",
-			temperature: .2,
-			max_tokens: 2200,
-			response_format: { type: "json_object" },
-			messages: [{
-				role: "system",
-				content: `你是「理路」的整理者。把用户的自我讨论整理成论证脉络图。只依据用户原话，不发明新观点。
+var ORGANIZE_SYSTEM_PROMPT = `你是「理路」的整理者。把用户的自我讨论整理成论证脉络图。只依据用户原话，不发明新观点。
 
 节点 kind 只能是: question, claim, evidence, objection, tension, synthesis, aside
 边 kind 只能是: supports, opposes, answers, derives, qualifies, relates
@@ -65,22 +26,25 @@ var organizeThoughts = createServerFn({ method: "POST" }).validator((input) => i
 - title 不超过 12 字
 
 只返回 JSON：
-{"title":"","spine":"","nodes":[{"id":"","kind":"","text":"","sourceIds":[]}],"edges":[{"id":"","from":"","to":"","kind":""}]}`
-			}, {
-				role: "user",
-				content: JSON.stringify(compact)
-			}]
-		})
-	});
-	if (!res.ok) return {
-		ok: false,
-		error: `xAI API error ${res.status}`
+{"title":"","spine":"","nodes":[{"id":"","kind":"","text":"","sourceIds":[]}],"edges":[{"id":"","from":"","to":"","kind":""}]}`;
+function buildCompactPayload(data) {
+	return {
+		title: data.title,
+		spine: data.spine,
+		entries: data.entries.slice(-24).map((e) => ({
+			id: e.id,
+			text: e.text.slice(0, 800)
+		})),
+		nodes: data.nodes.slice(0, 64).map(({ id, kind, text, sourceIds }) => ({
+			id,
+			kind,
+			text,
+			sourceIds
+		})),
+		edges: data.edges.slice(0, 80)
 	};
-	const parsed = parseModelJson((await res.json()).choices?.[0]?.message?.content ?? "");
-	if (!parsed) return {
-		ok: false,
-		error: "bad json"
-	};
+}
+function normalizeModelResult(parsed, data) {
 	const now = Date.now();
 	const existing = new Map(data.nodes.map((n) => [n.id, n]));
 	const entryIds = new Set(data.entries.map((e) => e.id));
@@ -128,6 +92,48 @@ var organizeThoughts = createServerFn({ method: "POST" }).validator((input) => i
 		nodes,
 		edges
 	};
+}
+var organizeThoughts_createServerFn_handler = createServerRpc({
+	id: "f7efc3551147c5883d381298d1619fc731b8a4f278b28bd51b830a342e97bed5",
+	name: "organizeThoughts",
+	filename: "src/lib/organize.ts"
+}, (opts) => organizeThoughts.__executeServer(opts));
+var organizeThoughts = createServerFn({ method: "POST" }).validator((input) => input).handler(organizeThoughts_createServerFn_handler, async ({ data }) => {
+	const apiKey = process.env["XAI_API_KEY"];
+	if (!apiKey) return {
+		ok: false,
+		error: "unavailable"
+	};
+	const res = await fetch("https://api.x.ai/v1/chat/completions", {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${apiKey}`
+		},
+		body: JSON.stringify({
+			model: "grok-4.5",
+			temperature: .2,
+			max_tokens: 2200,
+			response_format: { type: "json_object" },
+			messages: [{
+				role: "system",
+				content: ORGANIZE_SYSTEM_PROMPT
+			}, {
+				role: "user",
+				content: JSON.stringify(buildCompactPayload(data))
+			}]
+		})
+	});
+	if (!res.ok) return {
+		ok: false,
+		error: `xAI API error ${res.status}`
+	};
+	const parsed = parseModelJson((await res.json()).choices?.[0]?.message?.content ?? "");
+	if (!parsed) return {
+		ok: false,
+		error: "bad json"
+	};
+	return normalizeModelResult(parsed, data);
 });
 function parseModelJson(raw) {
 	const trimmed = raw.trim();

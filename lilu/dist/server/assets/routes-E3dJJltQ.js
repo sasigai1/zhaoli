@@ -1,8 +1,8 @@
 import { n as TSS_SERVER_FUNCTION, r as getServerFnById, t as createServerFn } from "../server.js";
-import { n as KIND_LABEL, t as EDGE_LABEL } from "./types-BWtpnAqn.js";
+import { i as isNodeKind, n as KIND_LABEL, r as isEdgeKind, t as EDGE_LABEL } from "./types-BWtpnAqn.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { jsx, jsxs } from "react/jsx-runtime";
-import { ArrowUp, List, Plus } from "lucide-react";
+import { ArrowUp, List, Plus, Settings2 } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { create } from "zustand";
@@ -398,6 +398,183 @@ function SpineStrip({ nodes, selectedId, organizing, onJump }) {
 	});
 }
 //#endregion
+//#region node_modules/@tanstack/start-server-core/dist/esm/createSsrRpc.js
+var createSsrRpc = (functionId) => {
+	const url = "/_serverFn/" + functionId;
+	const serverFnMeta = { id: functionId };
+	const fn = async (...args) => {
+		return (await getServerFnById(functionId, { origin: "server" }))(...args);
+	};
+	return Object.assign(fn, {
+		url,
+		serverFnMeta,
+		[TSS_SERVER_FUNCTION]: true
+	});
+};
+//#endregion
+//#region src/lib/organize.ts
+var ORGANIZE_SYSTEM_PROMPT = `你是「理路」的整理者。把用户的自我讨论整理成论证脉络图。只依据用户原话，不发明新观点。
+
+节点 kind 只能是: question, claim, evidence, objection, tension, synthesis, aside
+边 kind 只能是: supports, opposes, answers, derives, qualifies, relates
+
+规则：
+- 每个节点 text 是压缩后的一句思想，不超过 36 个汉字
+- 保留已有节点 id；可改 kind/text；可新增节点（id 用 n1、n2 这种短名亦可）
+- sourceIds 必须来自给定 entries 的 id
+- 用边把不同角度连起来：支持、反驳、推出、限定、相关
+- 找准真正的问题（question）与当前收敛（synthesis）
+- spine 用一句话写出当前骨架：问题 → 目前的收敛
+- title 不超过 12 字
+
+只返回 JSON：
+{"title":"","spine":"","nodes":[{"id":"","kind":"","text":"","sourceIds":[]}],"edges":[{"id":"","from":"","to":"","kind":""}]}`;
+function buildCompactPayload(data) {
+	return {
+		title: data.title,
+		spine: data.spine,
+		entries: data.entries.slice(-24).map((e) => ({
+			id: e.id,
+			text: e.text.slice(0, 800)
+		})),
+		nodes: data.nodes.slice(0, 64).map(({ id, kind, text, sourceIds }) => ({
+			id,
+			kind,
+			text,
+			sourceIds
+		})),
+		edges: data.edges.slice(0, 80)
+	};
+}
+/** 校验并归一化模型返回的 JSON（服务端与 App 直连共用）。 */
+function normalizeModelResult(parsed, data) {
+	const now = Date.now();
+	const existing = new Map(data.nodes.map((n) => [n.id, n]));
+	const entryIds = new Set(data.entries.map((e) => e.id));
+	const nodes = [];
+	if (Array.isArray(parsed.nodes)) for (const item of parsed.nodes) {
+		if (!item || typeof item !== "object") continue;
+		const rec = item;
+		const id = typeof rec.id === "string" && rec.id ? rec.id : `n_${nodes.length}`;
+		const kind = typeof rec.kind === "string" && isNodeKind(rec.kind) ? rec.kind : "claim";
+		const text = typeof rec.text === "string" ? rec.text.trim() : "";
+		if (!text) continue;
+		const sourceIds = Array.isArray(rec.sourceIds) ? rec.sourceIds.filter((s) => typeof s === "string" && entryIds.has(s)) : existing.get(id)?.sourceIds ?? [];
+		nodes.push({
+			id,
+			kind,
+			text: text.slice(0, 80),
+			sourceIds: sourceIds.length ? sourceIds : existing.get(id)?.sourceIds ?? [],
+			createdAt: existing.get(id)?.createdAt ?? now
+		});
+	}
+	if (nodes.length === 0) return {
+		ok: false,
+		error: "empty"
+	};
+	const nodeIds = new Set(nodes.map((n) => n.id));
+	const edges = [];
+	if (Array.isArray(parsed.edges)) for (const item of parsed.edges) {
+		if (!item || typeof item !== "object") continue;
+		const rec = item;
+		const from = typeof rec.from === "string" ? rec.from : "";
+		const to = typeof rec.to === "string" ? rec.to : "";
+		if (!nodeIds.has(from) || !nodeIds.has(to) || from === to) continue;
+		const kind = typeof rec.kind === "string" && isEdgeKind(rec.kind) ? rec.kind : "relates";
+		edges.push({
+			id: typeof rec.id === "string" && rec.id ? rec.id : `e_${edges.length}`,
+			from,
+			to,
+			kind
+		});
+	}
+	return {
+		ok: true,
+		title: typeof parsed.title === "string" && parsed.title.trim() ? parsed.title.trim().slice(0, 18) : data.title,
+		spine: typeof parsed.spine === "string" && parsed.spine.trim() ? parsed.spine.trim().slice(0, 80) : data.spine,
+		nodes,
+		edges
+	};
+}
+var organizeThoughts = createServerFn({ method: "POST" }).validator((input) => input).handler(createSsrRpc("f7efc3551147c5883d381298d1619fc731b8a4f278b28bd51b830a342e97bed5"));
+function parseModelJson(raw) {
+	const trimmed = raw.trim();
+	const candidate = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/)?.[1] ?? trimmed;
+	const start = candidate.indexOf("{");
+	const end = candidate.lastIndexOf("}");
+	if (start < 0 || end <= start) return null;
+	try {
+		return JSON.parse(candidate.slice(start, end + 1));
+	} catch {
+		return null;
+	}
+}
+//#endregion
+//#region src/lib/ai.ts
+var STORAGE_KEY = "lilu-ai-config-v1";
+function getAiConfig() {
+	if (typeof window === "undefined") return null;
+	try {
+		const raw = window.localStorage.getItem(STORAGE_KEY);
+		if (!raw) return null;
+		const c = JSON.parse(raw);
+		if (typeof c.apiKey === "string" && c.apiKey.trim() && typeof c.baseUrl === "string" && c.baseUrl.trim() && typeof c.model === "string" && c.model.trim()) return {
+			baseUrl: c.baseUrl.trim(),
+			apiKey: c.apiKey.trim(),
+			model: c.model.trim()
+		};
+	} catch {}
+	return null;
+}
+function saveAiConfig(config) {
+	window.localStorage.setItem(STORAGE_KEY, JSON.stringify({
+		baseUrl: config.baseUrl.trim(),
+		apiKey: config.apiKey.trim(),
+		model: config.model.trim()
+	}));
+}
+async function organizeWithAi(data, config) {
+	const url = config.baseUrl.replace(/\/+$/, "") + "/chat/completions";
+	let res;
+	try {
+		res = await fetch(url, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${config.apiKey}`
+			},
+			body: JSON.stringify({
+				model: config.model,
+				temperature: .2,
+				max_tokens: 2200,
+				response_format: { type: "json_object" },
+				messages: [{
+					role: "system",
+					content: ORGANIZE_SYSTEM_PROMPT
+				}, {
+					role: "user",
+					content: JSON.stringify(buildCompactPayload(data))
+				}]
+			})
+		});
+	} catch {
+		return {
+			ok: false,
+			error: "network"
+		};
+	}
+	if (!res.ok) return {
+		ok: false,
+		error: `api ${res.status}`
+	};
+	const parsed = parseModelJson((await res.json().catch(() => null))?.choices?.[0]?.message?.content ?? "");
+	if (!parsed) return {
+		ok: false,
+		error: "bad json"
+	};
+	return normalizeModelResult(parsed, data);
+}
+//#endregion
 //#region src/lib/heuristic.ts
 function splitClauses(text) {
 	return text.split(/\n+|(?<=[。！？；;!?])\s*/).map((s) => s.trim()).filter((s) => s.length > 1);
@@ -535,23 +712,6 @@ function createBlankSession() {
 		spine: ""
 	};
 }
-//#endregion
-//#region node_modules/@tanstack/start-server-core/dist/esm/createSsrRpc.js
-var createSsrRpc = (functionId) => {
-	const url = "/_serverFn/" + functionId;
-	const serverFnMeta = { id: functionId };
-	const fn = async (...args) => {
-		return (await getServerFnById(functionId, { origin: "server" }))(...args);
-	};
-	return Object.assign(fn, {
-		url,
-		serverFnMeta,
-		[TSS_SERVER_FUNCTION]: true
-	});
-};
-//#endregion
-//#region src/lib/organize.ts
-var organizeThoughts = createServerFn({ method: "POST" }).validator((input) => input).handler(createSsrRpc("f7efc3551147c5883d381298d1619fc731b8a4f278b28bd51b830a342e97bed5"));
 //#endregion
 //#region src/lib/sample.ts
 var T = Date.parse("2026-08-31T22:18:00+08:00");
@@ -853,7 +1013,9 @@ function activeSession(state) {
 //#endregion
 //#region src/components/app-home.tsx
 function isNativeApp() {
-	return typeof window !== "undefined" && typeof window.Capacitor?.isNativePlatform === "function" && window.Capacitor.isNativePlatform();
+	if (typeof window === "undefined") return false;
+	const cap = window.Capacitor;
+	return typeof cap?.isNativePlatform === "function" && cap.isNativePlatform();
 }
 function reorganizeLocally(target) {
 	let rebuilt = createBlankSession();
@@ -877,6 +1039,18 @@ function AppHome() {
 	const [listOpen, setListOpen] = useState(false);
 	const [editingTitle, setEditingTitle] = useState(false);
 	const [titleDraft, setTitleDraft] = useState("");
+	const [settingsOpen, setSettingsOpen] = useState(false);
+	const [keyDraft, setKeyDraft] = useState("");
+	const [baseUrlDraft, setBaseUrlDraft] = useState("https://api.x.ai/v1");
+	const [modelDraft, setModelDraft] = useState("grok-4.5");
+	useEffect(() => {
+		if (settingsOpen) {
+			const saved = getAiConfig();
+			setKeyDraft(saved?.apiKey ?? "");
+			setBaseUrlDraft(saved?.baseUrl ?? "https://api.x.ai/v1");
+			setModelDraft(saved?.model ?? "grok-4.5");
+		}
+	}, [settingsOpen]);
 	useEffect(() => {
 		useLilu.persist.rehydrate();
 	}, []);
@@ -892,6 +1066,52 @@ function AppHome() {
 	const refine = async (target) => {
 		useLilu.getState().setOrganizing(true);
 		if (isNativeApp()) {
+			const aiConfig = getAiConfig();
+			if (aiConfig) try {
+				const result = await organizeWithAi({
+					title: target.title,
+					spine: target.spine,
+					entries: target.entries.map((e) => ({
+						id: e.id,
+						text: e.text
+					})),
+					nodes: target.nodes.map((n) => ({
+						id: n.id,
+						kind: n.kind,
+						text: n.text,
+						sourceIds: n.sourceIds,
+						createdAt: n.createdAt
+					})),
+					edges: target.edges.map((e) => ({
+						id: e.id,
+						from: e.from,
+						to: e.to,
+						kind: e.kind
+					}))
+				}, aiConfig);
+				if (useLilu.getState().activeId !== target.id) {
+					useLilu.getState().setOrganizing(false);
+					return;
+				}
+				if (result.ok) {
+					useLilu.getState().applyOrganize({
+						title: result.title,
+						spine: result.spine,
+						nodes: result.nodes,
+						edges: result.edges
+					});
+					return;
+				}
+				const local = reorganizeLocally(target);
+				useLilu.getState().applyOrganize(local);
+				useLilu.getState().setOrganizing(false, "ai-failed");
+				return;
+			} catch {
+				const local = reorganizeLocally(target);
+				useLilu.getState().applyOrganize(local);
+				useLilu.getState().setOrganizing(false, "ai-failed");
+				return;
+			}
 			const local = reorganizeLocally(target);
 			useLilu.getState().applyOrganize(local);
 			return;
@@ -1001,6 +1221,16 @@ function AppHome() {
 							children: session.title || "新的一段"
 						})
 					}),
+					isNativeApp() ? /* @__PURE__ */ jsx("button", {
+						type: "button",
+						"aria-label": "AI 设置",
+						onClick: () => setSettingsOpen(true),
+						className: "flex size-11 items-center justify-center text-muted transition-colors hover:text-fg",
+						children: /* @__PURE__ */ jsx(Settings2, {
+							className: "size-5",
+							strokeWidth: 1.5
+						})
+					}) : null,
 					/* @__PURE__ */ jsx("button", {
 						type: "button",
 						"aria-label": "新的一段讨论",
@@ -1040,7 +1270,10 @@ function AppHome() {
 							onClick: () => void refine(session),
 							className: "text-sm text-muted transition-colors hover:text-fg disabled:opacity-40",
 							children: "重新整理"
-						}), organizeError && organizeError !== "unavailable" ? /* @__PURE__ */ jsx("p", {
+						}), organizeError === "ai-failed" ? /* @__PURE__ */ jsx("p", {
+							className: "mt-2 text-xs text-muted",
+							children: "AI 整理失败，已按字面整理。可在右上角设置里检查 Key。"
+						}) : organizeError && organizeError !== "unavailable" ? /* @__PURE__ */ jsx("p", {
 							className: "mt-2 text-xs text-muted",
 							children: "这一段先按字面接上了。"
 						}) : null]
@@ -1059,7 +1292,83 @@ function AppHome() {
 				onOpen: (id) => useLilu.getState().openSession(id),
 				onNew: () => useLilu.getState().newSession(),
 				onDelete: (id) => useLilu.getState().deleteSession(id)
-			})
+			}),
+			isNativeApp() && settingsOpen ? /* @__PURE__ */ jsx("div", {
+				className: "fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center",
+				onClick: () => setSettingsOpen(false),
+				children: /* @__PURE__ */ jsxs("div", {
+					className: "w-full max-w-md border border-border bg-surface p-5 pb-8 sm:rounded-lg",
+					onClick: (e) => e.stopPropagation(),
+					children: [
+						/* @__PURE__ */ jsx("p", {
+							className: "font-serif text-base text-fg",
+							children: "AI 整理设置"
+						}),
+						/* @__PURE__ */ jsx("p", {
+							className: "mt-1 text-xs leading-relaxed text-muted",
+							children: "填入 OpenAI 兼容接口的 API Key（xAI / DeepSeek / GLM / Kimi 等），整理时将直连 AI。 留空则使用本地规则整理。Key 只保存在本机。"
+						}),
+						/* @__PURE__ */ jsx("label", {
+							className: "mt-4 block text-xs text-muted",
+							htmlFor: "ai-base-url",
+							children: "接口地址"
+						}),
+						/* @__PURE__ */ jsx("input", {
+							id: "ai-base-url",
+							value: baseUrlDraft,
+							onChange: (e) => setBaseUrlDraft(e.target.value),
+							placeholder: "https://api.x.ai/v1",
+							className: "mt-1 w-full rounded border border-border bg-elevated px-3 py-2 text-sm text-fg outline-none focus:border-accent"
+						}),
+						/* @__PURE__ */ jsx("label", {
+							className: "mt-3 block text-xs text-muted",
+							htmlFor: "ai-model",
+							children: "模型"
+						}),
+						/* @__PURE__ */ jsx("input", {
+							id: "ai-model",
+							value: modelDraft,
+							onChange: (e) => setModelDraft(e.target.value),
+							placeholder: "grok-4.5",
+							className: "mt-1 w-full rounded border border-border bg-elevated px-3 py-2 text-sm text-fg outline-none focus:border-accent"
+						}),
+						/* @__PURE__ */ jsx("label", {
+							className: "mt-3 block text-xs text-muted",
+							htmlFor: "ai-key",
+							children: "API Key"
+						}),
+						/* @__PURE__ */ jsx("input", {
+							id: "ai-key",
+							type: "password",
+							value: keyDraft,
+							onChange: (e) => setKeyDraft(e.target.value),
+							placeholder: "sk-…",
+							className: "mt-1 w-full rounded border border-border bg-elevated px-3 py-2 text-sm text-fg outline-none focus:border-accent"
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "mt-5 flex justify-end gap-3",
+							children: [/* @__PURE__ */ jsx("button", {
+								type: "button",
+								onClick: () => setSettingsOpen(false),
+								className: "rounded px-4 py-2 text-sm text-muted transition-colors hover:text-fg",
+								children: "取消"
+							}), /* @__PURE__ */ jsx("button", {
+								type: "button",
+								onClick: () => {
+									if (keyDraft.trim() && baseUrlDraft.trim() && modelDraft.trim()) saveAiConfig({
+										apiKey: keyDraft,
+										baseUrl: baseUrlDraft,
+										model: modelDraft
+									});
+									setSettingsOpen(false);
+								},
+								className: "rounded bg-accent px-4 py-2 text-sm text-accent-fg transition-opacity hover:opacity-90",
+								children: "保存"
+							})]
+						})
+					]
+				})
+			}) : null
 		]
 	});
 }

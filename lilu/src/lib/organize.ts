@@ -33,40 +33,7 @@ type ModelJson = {
   edges?: unknown;
 };
 
-export const organizeThoughts = createServerFn({ method: "POST" })
-  .validator((input: OrganizePayload) => input)
-  .handler(async ({ data }): Promise<OrganizeResult> => {
-    const apiKey = process.env["XAI_API_KEY"];
-    if (!apiKey) return { ok: false, error: "unavailable" };
-
-    const compact = {
-      title: data.title,
-      spine: data.spine,
-      entries: data.entries.slice(-24).map((e) => ({ id: e.id, text: e.text.slice(0, 800) })),
-      nodes: data.nodes.slice(0, 64).map(({ id, kind, text, sourceIds }) => ({
-        id,
-        kind,
-        text,
-        sourceIds,
-      })),
-      edges: data.edges.slice(0, 80),
-    };
-
-    const res = await fetch("https://api.x.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "grok-4.5",
-        temperature: 0.2,
-        max_tokens: 2200,
-        response_format: { type: "json_object" },
-        messages: [
-          {
-            role: "system",
-            content: `你是「理路」的整理者。把用户的自我讨论整理成论证脉络图。只依据用户原话，不发明新观点。
+export const ORGANIZE_SYSTEM_PROMPT = `你是「理路」的整理者。把用户的自我讨论整理成论证脉络图。只依据用户原话，不发明新观点。
 
 节点 kind 只能是: question, claim, evidence, objection, tension, synthesis, aside
 边 kind 只能是: supports, opposes, answers, derives, qualifies, relates
@@ -81,11 +48,106 @@ export const organizeThoughts = createServerFn({ method: "POST" })
 - title 不超过 12 字
 
 只返回 JSON：
-{"title":"","spine":"","nodes":[{"id":"","kind":"","text":"","sourceIds":[]}],"edges":[{"id":"","from":"","to":"","kind":""}]}`,
-          },
+{"title":"","spine":"","nodes":[{"id":"","kind":"","text":"","sourceIds":[]}],"edges":[{"id":"","from":"","to":"","kind":""}]}`;
+
+export function buildCompactPayload(data: OrganizePayload) {
+  return {
+    title: data.title,
+    spine: data.spine,
+    entries: data.entries.slice(-24).map((e) => ({ id: e.id, text: e.text.slice(0, 800) })),
+    nodes: data.nodes.slice(0, 64).map(({ id, kind, text, sourceIds }) => ({
+      id,
+      kind,
+      text,
+      sourceIds,
+    })),
+    edges: data.edges.slice(0, 80),
+  };
+}
+
+/** 校验并归一化模型返回的 JSON（服务端与 App 直连共用）。 */
+export function normalizeModelResult(parsed: ModelJson, data: OrganizePayload): OrganizeResult {
+  const now = Date.now();
+  const existing = new Map(data.nodes.map((n) => [n.id, n]));
+  const entryIds = new Set(data.entries.map((e) => e.id));
+
+  const nodes: ThoughtNode[] = [];
+  if (Array.isArray(parsed.nodes)) {
+    for (const item of parsed.nodes) {
+      if (!item || typeof item !== "object") continue;
+      const rec = item as Record<string, unknown>;
+      const id = typeof rec.id === "string" && rec.id ? rec.id : `n_${nodes.length}`;
+      const kind = typeof rec.kind === "string" && isNodeKind(rec.kind) ? rec.kind : "claim";
+      const text = typeof rec.text === "string" ? rec.text.trim() : "";
+      if (!text) continue;
+      const sourceIds = Array.isArray(rec.sourceIds)
+        ? rec.sourceIds.filter((s): s is string => typeof s === "string" && entryIds.has(s))
+        : (existing.get(id)?.sourceIds ?? []);
+      nodes.push({
+        id,
+        kind,
+        text: text.slice(0, 80),
+        sourceIds: sourceIds.length ? sourceIds : existing.get(id)?.sourceIds ?? [],
+        createdAt: existing.get(id)?.createdAt ?? now,
+      });
+    }
+  }
+
+  if (nodes.length === 0) return { ok: false, error: "empty" };
+
+  const nodeIds = new Set(nodes.map((n) => n.id));
+  const edges: ThoughtEdge[] = [];
+  if (Array.isArray(parsed.edges)) {
+    for (const item of parsed.edges) {
+      if (!item || typeof item !== "object") continue;
+      const rec = item as Record<string, unknown>;
+      const from = typeof rec.from === "string" ? rec.from : "";
+      const to = typeof rec.to === "string" ? rec.to : "";
+      if (!nodeIds.has(from) || !nodeIds.has(to) || from === to) continue;
+      const kind = typeof rec.kind === "string" && isEdgeKind(rec.kind) ? rec.kind : "relates";
+      edges.push({
+        id: typeof rec.id === "string" && rec.id ? rec.id : `e_${edges.length}`,
+        from,
+        to,
+        kind,
+      });
+    }
+  }
+
+  const title =
+    typeof parsed.title === "string" && parsed.title.trim()
+      ? parsed.title.trim().slice(0, 18)
+      : data.title;
+  const spine =
+    typeof parsed.spine === "string" && parsed.spine.trim()
+      ? parsed.spine.trim().slice(0, 80)
+      : data.spine;
+
+  return { ok: true, title, spine, nodes, edges };
+}
+
+export const organizeThoughts = createServerFn({ method: "POST" })
+  .validator((input: OrganizePayload) => input)
+  .handler(async ({ data }): Promise<OrganizeResult> => {
+    const apiKey = process.env["XAI_API_KEY"];
+    if (!apiKey) return { ok: false, error: "unavailable" };
+
+    const res = await fetch("https://api.x.ai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "grok-4.5",
+        temperature: 0.2,
+        max_tokens: 2200,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: ORGANIZE_SYSTEM_PROMPT },
           {
             role: "user",
-            content: JSON.stringify(compact),
+            content: JSON.stringify(buildCompactPayload(data)),
           },
         ],
       }),
@@ -101,67 +163,10 @@ export const organizeThoughts = createServerFn({ method: "POST" })
     const raw = body.choices?.[0]?.message?.content ?? "";
     const parsed = parseModelJson(raw);
     if (!parsed) return { ok: false, error: "bad json" };
-
-    const now = Date.now();
-    const existing = new Map(data.nodes.map((n) => [n.id, n]));
-    const entryIds = new Set(data.entries.map((e) => e.id));
-
-    const nodes: ThoughtNode[] = [];
-    if (Array.isArray(parsed.nodes)) {
-      for (const item of parsed.nodes) {
-        if (!item || typeof item !== "object") continue;
-        const rec = item as Record<string, unknown>;
-        const id = typeof rec.id === "string" && rec.id ? rec.id : `n_${nodes.length}`;
-        const kind = typeof rec.kind === "string" && isNodeKind(rec.kind) ? rec.kind : "claim";
-        const text = typeof rec.text === "string" ? rec.text.trim() : "";
-        if (!text) continue;
-        const sourceIds = Array.isArray(rec.sourceIds)
-          ? rec.sourceIds.filter((s): s is string => typeof s === "string" && entryIds.has(s))
-          : (existing.get(id)?.sourceIds ?? []);
-        nodes.push({
-          id,
-          kind,
-          text: text.slice(0, 80),
-          sourceIds: sourceIds.length ? sourceIds : existing.get(id)?.sourceIds ?? [],
-          createdAt: existing.get(id)?.createdAt ?? now,
-        });
-      }
-    }
-
-    if (nodes.length === 0) return { ok: false, error: "empty" };
-
-    const nodeIds = new Set(nodes.map((n) => n.id));
-    const edges: ThoughtEdge[] = [];
-    if (Array.isArray(parsed.edges)) {
-      for (const item of parsed.edges) {
-        if (!item || typeof item !== "object") continue;
-        const rec = item as Record<string, unknown>;
-        const from = typeof rec.from === "string" ? rec.from : "";
-        const to = typeof rec.to === "string" ? rec.to : "";
-        if (!nodeIds.has(from) || !nodeIds.has(to) || from === to) continue;
-        const kind = typeof rec.kind === "string" && isEdgeKind(rec.kind) ? rec.kind : "relates";
-        edges.push({
-          id: typeof rec.id === "string" && rec.id ? rec.id : `e_${edges.length}`,
-          from,
-          to,
-          kind,
-        });
-      }
-    }
-
-    const title =
-      typeof parsed.title === "string" && parsed.title.trim()
-        ? parsed.title.trim().slice(0, 18)
-        : data.title;
-    const spine =
-      typeof parsed.spine === "string" && parsed.spine.trim()
-        ? parsed.spine.trim().slice(0, 80)
-        : data.spine;
-
-    return { ok: true, title, spine, nodes, edges };
+    return normalizeModelResult(parsed, data);
   });
 
-function parseModelJson(raw: string): ModelJson | null {
+export function parseModelJson(raw: string): ModelJson | null {
   const trimmed = raw.trim();
   const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/);
   const candidate = fenced?.[1] ?? trimmed;
