@@ -51,6 +51,7 @@ body {
   display: flex;
   flex-direction: column;
   --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
 }
 
 @media (max-width: 430px) {
@@ -429,11 +430,11 @@ body {
 }
 .toast.show { opacity: 1; transform: translateX(-50%); }
 
-/* ---------- 真机安全区（底部） ---------- */
+/* ---------- 真机安全区（底部，变量可被 JS 回退覆盖） ---------- */
 @media (max-width: 430px) {
-  .radial { bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
-  .toast { bottom: calc(104px + env(safe-area-inset-bottom, 0px)); }
-  .content, .sheet-body { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+  .radial { bottom: calc(24px + var(--sab)); }
+  .toast { bottom: calc(104px + var(--sab)); }
+  .content, .sheet-body { padding-bottom: calc(120px + var(--sab)); }
 }
 
 /* ---------- 键盘可达性 / 动效克制 ---------- */

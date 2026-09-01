@@ -379,6 +379,30 @@
     root.scrollTop = 0;
   }
 
+  /* ---------- 安全区回退（部分安卓 WebView 不支持 env(safe-area-inset-*)，返回 0） ----------
+     探测 env() 实际值；若为 0 且处于窄屏（真机 WebView）环境，
+     用 screen.height - innerHeight 差值估算状态栏/导航栏高度。 */
+  function applySafeAreaFallback() {
+    var probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:env(safe-area-inset-top, 0px);visibility:hidden;pointer-events:none;';
+    document.body.appendChild(probe);
+    var insetTop = probe.getBoundingClientRect().height;
+    probe.remove();
+
+    var isMobileUA = /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
+    if (!isMobileUA || insetTop > 0) return;
+
+    var estTop = 28, estBottom = 0;
+    var diff = (window.screen.height - window.innerHeight);
+    if (diff > 0 && diff < 120) {
+      // 铺满全屏时差值 ≈ 状态栏 + 导航栏，按常见比例分配
+      estTop = Math.max(24, Math.round(diff * 0.6));
+      estBottom = Math.max(0, diff - estTop);
+    }
+    phone.style.setProperty('--sat', estTop + 'px');
+    phone.style.setProperty('--sab', estBottom + 'px');
+  }
+
   /* ---------- 初始化 ---------- */
   document.addEventListener('DOMContentLoaded', function () {
     root = $('#view-root');
@@ -386,6 +410,9 @@
 
     var t = new Date();
     $('#date-badge').textContent = cnDate(fmt(t)) + ' 周' + WEEK[t.getDay()];
+
+    applySafeAreaFallback();
+    window.addEventListener('resize', applySafeAreaFallback);
 
     $('#fab').addEventListener('click', function () {
       phone.dataset.menu = phone.dataset.menu === 'open' ? 'closed' : 'open';
