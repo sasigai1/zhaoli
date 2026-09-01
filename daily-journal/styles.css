@@ -29,6 +29,8 @@ body {
 }
 
 /* ---------- 手机框架 ---------- */
+/* 与 jingguo-app 一致：不自绘状态栏。
+   应用背景延伸到系统状态栏底下（沉浸式），顶栏内容用安全区 padding 下移。 */
 .phone {
   position: relative;
   width: 390px;
@@ -40,39 +42,24 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  --sb: 28px;
+  /* 桌面预览框架内模拟设备状态栏高度的安全区 */
+  --sat: 28px;
 }
 
 @media (max-width: 430px) {
   body { display: block; }
   .phone {
     width: 100%; height: 100dvh; margin: 0; border: none; border-radius: 0;
-    --sb: calc(env(safe-area-inset-top, 0px) + 28px);
+    /* 真机：跟随系统实际安全区（配合 viewport-fit=cover） */
+    --sat: env(safe-area-inset-top, 0px);
   }
 }
-
-/* ---------- 状态栏（安卓风格模拟） ---------- */
-.statusbar {
-  flex: none;
-  height: var(--sb);
-  padding: 0 24px;
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--bg);
-  color: var(--ink-1);
-  z-index: 55;
-}
-.sb-time {
-  font-size: 12px; font-weight: 500;
-  font-variant-numeric: tabular-nums; letter-spacing: 0.05em;
-}
-.sb-icons { display: flex; align-items: center; gap: 6px; color: var(--ink-1); }
-.sb-icons svg { width: 13px; height: 13px; }
 
 /* ---------- 顶栏 ---------- */
 .topbar {
   flex: none;
-  height: 56px;
-  padding: 0 20px;
+  height: calc(56px + var(--sat));
+  padding: var(--sat) 20px 0;
   display: flex; align-items: center; justify-content: space-between;
   background: rgba(253, 253, 251, 0.92);
   backdrop-filter: blur(8px);
@@ -383,7 +370,7 @@ body {
 #sheet-mask.open { opacity: 1; pointer-events: auto; }
 .sheet {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 52;
-  top: var(--sb);
+  top: var(--sat);
   background: var(--bg);
   display: flex; flex-direction: column;
   transform: translateY(110%);

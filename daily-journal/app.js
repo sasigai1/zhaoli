@@ -400,7 +400,6 @@
 
     var t = new Date();
     $('#date-badge').textContent = cnDate(fmt(t)) + ' 周' + WEEK[t.getDay()];
-    $('#sb-time').textContent = pad(t.getHours()) + ':' + pad(t.getMinutes());
 
     $('#fab').addEventListener('click', function () {
       phone.dataset.menu = phone.dataset.menu === 'open' ? 'closed' : 'open';
