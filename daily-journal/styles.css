@@ -20,12 +20,19 @@
 
 html, body { height: 100%; }
 
+/* 根背景设为应用底色：真机 WebView 沉浸式时状态栏/回弹区域渲染为浅色，避免黑边 */
+html {
+  background: var(--bg);
+  color-scheme: light;
+}
+
 body {
   font-family: -apple-system, "HarmonyOS Sans SC", "PingFang SC", "Noto Sans SC", "Hiragino Sans GB", sans-serif;
-  background: #F0F0EC;
+  background: var(--bg);
   color: var(--ink-1);
   display: flex;
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* ---------- 手机框架 ---------- */
