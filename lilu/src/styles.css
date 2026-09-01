@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #12110f;
+  --color-surface: #1a1916;
+  --color-elevated: #221f1b;
+  --color-fg: #ede8df;
+  --color-muted: #8c877c;
+  --color-subtle: #5c5850;
+  --color-accent: #d8d3c8;
+  --color-accent-fg: #12110f;
+  --color-border: #2a2824;
+  --color-oppose: #c17a70;
+  --color-kind: #a39e93;
+
+  --font-sans: "Noto Serif SC", "Songti SC", "Source Han Serif SC", "Noto Serif", Georgia, serif;
+  --font-serif: "Noto Serif SC", "Songti SC", "Source Han Serif SC", Georgia, serif;
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+
+  --shadow-hairline: 0 0 0 1px color-mix(in oklab, var(--color-fg) 8%, transparent);
+
+  --tracking-mark: 0.18em;
+  --tracking-label: 0.28em;
+  --tracking-brand: 0.42em;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.1875rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  html,
+  body,
+  #app {
+    min-height: 100%;
+    background: var(--color-bg);
+    color: var(--color-fg);
+    overflow-x: hidden;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    letter-spacing: 0.01em;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-fg) 22%, transparent);
+    color: var(--color-fg);
+  }
+
+  textarea,
+  input {
+    font-family: inherit;
+  }
+}
+
+@layer components {
+  .kind-oppose {
+    color: var(--color-oppose);
+  }
+
+  .composer-pad {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .node-enter {
+    animation: node-in 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--color-muted) 0%,
+      var(--color-fg) 45%,
+      var(--color-muted) 100%
+    );
+    background-size: 180% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 1.6s linear infinite;
+  }
+}
+
+@keyframes node-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -20% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node-enter,
+  .shimmer {
+    animation: none;
+  }
+
+  .shimmer {
+    color: var(--color-muted);
+    background: none;
+  }
+}

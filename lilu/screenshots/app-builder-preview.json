@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "理路",
+      "hasCanvas": false,
+      "bodyTextLen": 287,
+      "bodyTextHash": "a1ee8164d71e807f6595e35902459a014c2ee24ac1ad7b6578cb4db74a0d1e7d",
+      "bodyTextPrefix": "要不要换工作 问 · 立 · 立 · 据 · 驳 · 立 · 旁 · 合 · 合 我还愿不愿意把自己放进一个会失败的位置 → 先",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "理路",
+      "hasCanvas": false,
+      "bodyTextLen": 287,
+      "bodyTextHash": "a1ee8164d71e807f6595e35902459a014c2ee24ac1ad7b6578cb4db74a0d1e7d",
+      "bodyTextPrefix": "要不要换工作 问 · 立 · 立 · 据 · 驳 · 立 · 旁 · 合 · 合 我还愿不愿意把自己放进一个会失败的位置 → 先",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}
