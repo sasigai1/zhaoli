@@ -63,11 +63,11 @@
     return '<section class="card empty"><i data-lucide="' + icon + '"></i><p>' + text + '</p></section>';
   }
 
-  /* ---------- 日内单条记录（时间线行） ---------- */
+  /* ---------- 日内单条记录（时间线行，携带当时心情） ---------- */
   function entryHtml(en) {
     var tagsHtml = en.tags.map(function (t) { return '<span class="mini-tag">' + esc(t) + '</span>'; }).join('');
     return '<div class="dtl-row">' +
-      '<span class="dtl-time">' + esc(en.time) + '</span>' +
+      '<span class="dtl-time"><i data-lucide="' + MOODS[en.mood].icon + '"></i><b>' + esc(en.time) + '</b></span>' +
       '<div class="dtl-main">' +
         '<p class="dtl-text">' + esc(en.text) + '</p>' +
         (tagsHtml ? '<span class="chips-inline">' + tagsHtml + '</span>' : '') +
@@ -82,14 +82,12 @@
       en.tags.forEach(function (t) { tagSet[t] = 1; });
     });
     var tagsHtml = Object.keys(tagSet).map(function (t) { return '<span class="mini-tag">' + esc(t) + '</span>'; }).join('');
-    var moodHtml = e.mood
-      ? '<span class="tl-mood"><i data-lucide="' + MOODS[e.mood].icon + '"></i>' + MOODS[e.mood].label + '</span>'
-      : '<span class="tl-mood"><i data-lucide="feather"></i>共 ' + e.entries.length + ' 条</span>';
+    var lastMood = e.entries[e.entries.length - 1].mood;
     var dayNum = showMonth ? e.date.slice(5).replace('-', '.') : String(+e.date.slice(8));
     return '<button class="tl-row" data-day="' + e.date + '">' +
       '<span class="tl-d"><b class="' + (showMonth ? 'sm' : '') + '">' + dayNum + '</b><i>周' + weekday(e.date) + '</i></span>' +
       '<span class="tl-body">' +
-        moodHtml +
+        '<span class="tl-mood"><i data-lucide="' + MOODS[lastMood].icon + '"></i>' + MOODS[lastMood].label + ' · ' + e.entries.length + ' 条</span>' +
         '<span class="tl-text">' + esc(e.entries[0].text) + '</span>' +
         (tagsHtml ? '<span class="tl-tags">' + tagsHtml + '</span>' : '') +
       '</span></button>';
@@ -112,22 +110,16 @@
         '<p class="hero-sub">周' + WEEK[t.getDay()] + ' · 记录的第 ' + DB.dayIndex() + ' 天</p>' +
       '</section>' +
       tlHtml +
-      '<section class="card">' +
-        '<h3 class="card-label">今日心情</h3>' +
+      '<section class="card composer">' +
+        '<h3 class="card-label">记一条</h3>' +
         '<div class="moods">' + MOODS.slice(1).map(function (m, i) {
           return '<button class="mood' + (state.draft.mood === i + 1 ? ' on' : '') + '" data-mood="' + (i + 1) + '" aria-label="' + m.label + '">' +
             '<i data-lucide="' + m.icon + '"></i><span>' + m.label + '</span><span class="mood-bar"></span></button>';
         }).join('') + '</div>' +
-      '</section>' +
-      '<section class="card">' +
-        '<h3 class="card-label">标签</h3>' +
         '<div class="chips">' + DB.allTags().map(function (tg) {
           var on = state.draft.tags.indexOf(tg) >= 0;
           return '<button class="chip' + (on ? ' on' : '') + '" data-tag="' + esc(tg) + '">' + esc(tg) + '</button>';
         }).join('') + '</div>' +
-      '</section>' +
-      '<section class="card">' +
-        '<h3 class="card-label">记一条</h3>' +
         '<textarea class="ta" id="ta" placeholder="此刻发生了什么……">' + esc(state.draft.text) + '</textarea>' +
       '</section>' +
       '<button class="btn btn-primary" id="save-btn"><i data-lucide="check"></i>添加到今日时间线</button>';
@@ -151,8 +143,7 @@
       var text = state.draft.text.trim();
       if (!text) { toast('先写点什么吧'); return; }
       var now = new Date();
-      DB.setMood(state.draft.mood);
-      DB.addEntry(text, state.draft.tags, pad(now.getHours()) + ':' + pad(now.getMinutes()));
+      DB.addEntry(text, state.draft.tags, pad(now.getHours()) + ':' + pad(now.getMinutes()), state.draft.mood);
       state.draft.text = '';
       state.draft.tags = [];
       toast('已记录');
@@ -354,11 +345,6 @@
           '<h2 class="hero-date">' + p[1] + '<em>.</em>' + p[2] + '</h2>' +
           '<p class="hero-sub">周' + weekday(ds) + ' · 共 ' + e.entries.length + ' 条记录</p>' +
         '</div>' +
-        (e.mood
-          ? '<section class="card day-meta">' +
-              '<span class="day-mood"><i data-lucide="' + MOODS[e.mood].icon + '"></i>' + MOODS[e.mood].label + '</span>' +
-            '</section>'
-          : '') +
         '<p class="group-label">这一天</p>' +
         '<section class="card"><div class="dtl">' + e.entries.map(entryHtml).join('') + '</div></section>';
     } else {

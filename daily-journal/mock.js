@@ -12,11 +12,11 @@
   var today = new Date(); today.setHours(0, 0, 0, 0);
 
   /* 全新应用：无任何历史记录。
-     一天 = { date, mood(0=未标记), entries: [{ time, text, tags }] }，仅保存在内存（刷新还原）。 */
+     一天 = { date, entries: [{ time, mood, text, tags }] }，心情随每条记录保存（代表当时心情），仅保存在内存（刷新还原）。 */
   var store = {};
 
   function ensureDay(ds) {
-    if (!store[ds]) store[ds] = { date: ds, mood: 0, entries: [] };
+    if (!store[ds]) store[ds] = { date: ds, entries: [] };
     return store[ds];
   }
   function hasContent(d) { return d && d.entries.length; }
@@ -36,10 +36,9 @@
     },
 
     /* ---------- 今日视图写入（仅内存，刷新还原） ---------- */
-    addEntry: function (text, tags, timeStr) {
-      ensureDay(DB.todayStr).entries.push({ time: timeStr, text: text, tags: tags.slice() });
+    addEntry: function (text, tags, timeStr, mood) {
+      ensureDay(DB.todayStr).entries.push({ time: timeStr, mood: mood, text: text, tags: tags.slice() });
     },
-    setMood: function (mood) { ensureDay(DB.todayStr).mood = mood; },
 
     dayIndex: function () {
       var ks = Object.keys(store).sort();
@@ -54,9 +53,9 @@
       var tagCount = {};
       var totalEntries = 0;
       list.forEach(function (e) {
-        if (e.mood >= 1 && e.mood <= 5) moodDist[e.mood - 1]++;
         e.entries.forEach(function (en) {
           totalEntries++;
+          if (en.mood >= 1 && en.mood <= 5) moodDist[en.mood - 1]++;
           en.tags.forEach(function (t) { tagCount[t] = (tagCount[t] || 0) + 1; });
         });
       });

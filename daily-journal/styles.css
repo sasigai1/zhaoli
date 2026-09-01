@@ -30,7 +30,8 @@ body {
 
 /* ---------- 手机框架 ---------- */
 /* 与 jingguo-app 一致：不自绘状态栏。
-   应用背景延伸到系统状态栏底下（沉浸式），顶栏内容用安全区 padding 下移。 */
+   顶部安全区完全由 env(safe-area-inset-top) 决定：
+   真机沉浸式时自动为系统状态栏让位，普通浏览器/桌面为 0（顶栏顶格）。 */
 .phone {
   position: relative;
   width: 390px;
@@ -42,16 +43,13 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  /* 桌面预览框架内模拟设备状态栏高度的安全区 */
-  --sat: 28px;
+  --sat: env(safe-area-inset-top, 0px);
 }
 
 @media (max-width: 430px) {
   body { display: block; }
   .phone {
     width: 100%; height: 100dvh; margin: 0; border: none; border-radius: 0;
-    /* 真机：跟随系统实际安全区（配合 viewport-fit=cover） */
-    --sat: env(safe-area-inset-top, 0px);
   }
 }
 
@@ -303,15 +301,17 @@ body {
 }
 .tl-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 
-/* ---------- 日内时间线（今日 / 日详情共用） ---------- */
+/* ---------- 日内时间线（今日 / 日详情共用，携带当时心情） ---------- */
 .dtl { display: flex; flex-direction: column; }
 .dtl-row { display: flex; gap: 12px; }
 .dtl-row + .dtl-row { margin-top: 16px; }
 .dtl-time {
-  width: 36px; flex: none;
+  width: 40px; flex: none;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
   font-size: 12px; color: var(--ink-3); letter-spacing: 0.05em;
-  font-variant-numeric: tabular-nums; line-height: 21px;
+  font-variant-numeric: tabular-nums; line-height: 1.2;
 }
+.dtl-time svg { width: 15px; height: 15px; color: var(--ink-2); }
 .dtl-main { flex: 1; min-width: 0; position: relative; padding-left: 20px; }
 .dtl-main::before {
   content: ''; position: absolute; left: 0; top: 7px;
@@ -325,6 +325,11 @@ body {
 }
 .dtl-text { font-size: 14px; line-height: 1.7; color: var(--ink-1); }
 .dtl-main .chips-inline { margin-top: 8px; }
+
+/* 记一条：心情 + 标签 + 文本 */
+.composer .moods { padding-bottom: 12px; border-bottom: 1px solid var(--hair); }
+.composer .chips { margin-top: 12px; }
+.composer .ta { margin-top: 12px; min-height: 120px; }
 
 /* ---------- 统计 ---------- */
 .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -393,12 +398,6 @@ body {
 .sheet-body::-webkit-scrollbar { display: none; }
 .sheet-body > * + * { margin-top: 12px; }
 
-.day-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.day-mood {
-  display: flex; align-items: center; gap: 4px;
-  font-size: 12px; color: var(--ink-2); letter-spacing: 0.05em;
-}
-.day-mood svg { width: 16px; height: 16px; }
 .chips-inline { display: flex; flex-wrap: wrap; gap: 4px; }
 .day-text { font-size: 14px; line-height: 1.75; color: var(--ink-1); }
 
