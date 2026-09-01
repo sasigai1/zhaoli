@@ -12,8 +12,18 @@
   var today = new Date(); today.setHours(0, 0, 0, 0);
 
   /* 全新应用：无任何历史记录。
-     一天 = { date, entries: [{ time, mood, text, tags }] }，心情随每条记录保存（代表当时心情），仅保存在内存（刷新还原）。 */
+     一天 = { date, entries: [{ time, mood, text, tags }] }，心情随每条记录保存（代表当时心情）。
+     记录持久化到 localStorage，退出/刷新不丢失。 */
+  var KEY = 'daily-journal-v1';
   var store = {};
+  try {
+    var saved = localStorage.getItem(KEY);
+    if (saved) store = JSON.parse(saved) || {};
+  } catch (e) { store = {}; }
+
+  function persist() {
+    try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {}
+  }
 
   function ensureDay(ds) {
     if (!store[ds]) store[ds] = { date: ds, entries: [] };
@@ -35,9 +45,10 @@
         .filter(hasContent);
     },
 
-    /* ---------- 今日视图写入（仅内存，刷新还原） ---------- */
+    /* ---------- 今日视图写入（localStorage 持久化） ---------- */
     addEntry: function (text, tags, timeStr, mood) {
       ensureDay(DB.todayStr).entries.push({ time: timeStr, mood: mood, text: text, tags: tags.slice() });
+      persist();
     },
 
     dayIndex: function () {
