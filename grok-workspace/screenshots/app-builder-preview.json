@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "日档 FOLIO",
+      "hasCanvas": false,
+      "bodyTextLen": 541,
+      "bodyTextHash": "c7a5454b70fbd515f8c6cc5cd296a00bd95dec87292a8bb6b1e45e8993326089",
+      "bodyTextPrefix": "FOLIO 日档 ——:——:—— F-2026-244 2026.09.01 TUE · 2026年9月1日 星期二 STAT",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "日档 FOLIO",
+      "hasCanvas": false,
+      "bodyTextLen": 541,
+      "bodyTextHash": "c7a5454b70fbd515f8c6cc5cd296a00bd95dec87292a8bb6b1e45e8993326089",
+      "bodyTextPrefix": "FOLIO 日档 ——:——:—— F-2026-244 2026.09.01 TUE · 2026年9月1日 星期二 STAT",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

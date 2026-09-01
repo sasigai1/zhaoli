@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f1eee6;
+  --color-paper-2: #e4dfd3;
+  --color-surface: #faf8f3;
+  --color-ink: #1a1916;
+  --color-muted: #6e6b63;
+  --color-faint: #9a968c;
+  --color-rule: #c9c4b8;
+  --color-stamp: #8f2d2d;
+  --color-stamp-soft: #d7c2be;
+  --font-sans: "IBM Plex Sans", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --shadow-border: 0 0 0 1px rgba(26, 25, 22, 0.1), 0 1px 2px -1px rgba(26, 25, 22, 0.06);
+  --shadow-border-hover: 0 0 0 1px rgba(26, 25, 22, 0.16), 0 1px 2px -1px rgba(26, 25, 22, 0.08);
+  --shadow-device: 0 0 0 1px rgba(26, 25, 22, 0.08), 0 24px 64px -24px rgba(26, 25, 22, 0.28);
+  --ease-out-folio: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html,
+  body,
+  #app {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-paper-2);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    touch-action: manipulation;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  input,
+  textarea {
+    font-family: inherit;
+  }
+}
+
+@layer utilities {
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+  .pb-nav {
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+  }
+}
+
+.folio-ruled {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 27px,
+    var(--color-rule) 27px,
+    var(--color-rule) 28px
+  );
+  background-attachment: local;
+  line-height: 28px;
+}
+
+.folio-stamp {
+  transform: rotate(-12deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .folio-stamp {
+    transform: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

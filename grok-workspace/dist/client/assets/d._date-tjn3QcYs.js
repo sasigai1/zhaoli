@@ -1,0 +1,1 @@
+import{X as e}from"./store-LDLxWmY4.js";import{t}from"./day-editor-BzUEEFFL.js";import{t as n}from"./index-D0E_4aTE.js";var r=e();function i(){let{date:e}=n.useParams();return(0,r.jsx)(t,{date:e})}export{i as component};
