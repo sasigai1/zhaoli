@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "理路",
+      "hasCanvas": false,
+      "bodyTextLen": 464,
+      "bodyTextHash": "90c6dcff770141977c020b490417646899aa1b48addad88a5b33dc55bf303230",
+      "bodyTextPrefix": "理路 什么是真正的简单 看全貌 分 续 反 问 续 分 反 续 问 续 续 简单不是少，而是恰好。 收起 少，是在做删减。恰好，",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "理路",
+      "hasCanvas": false,
+      "bodyTextLen": 445,
+      "bodyTextHash": "4cec1cbbfcacead69094cbe25e2680a6874ce7e875679b18ca65f0087e96d262",
+      "bodyTextPrefix": "理路 什么是真正的简单 分 续 反 问 续 分 反 续 问 续 续 简单不是少，而是恰好。 收起 少，是在做删减。恰好，是结构对",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

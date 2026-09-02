@@ -1,0 +1,109 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme {
+  --color-bg: #f3eee4;
+  --color-surface: #faf7f1;
+  --color-surface-2: #ede7db;
+  --color-fg: #1c1915;
+  --color-muted: #7a7368;
+  --color-subtle: #a39b90;
+  --color-border: #ddd6c8;
+  --color-primary: #1c1915;
+  --color-primary-fg: #f3eee4;
+  --color-accent: #8b3a2f;
+  --color-accent-fg: #faf7f1;
+  --color-ring: #8b3a2f;
+  --color-ink-faint: rgb(28 25 21 / 0.22);
+  --color-ink-mid: rgb(28 25 21 / 0.62);
+
+  --font-sans: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB",
+    "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+  --font-display: "Noto Serif SC", "Songti SC", "STSong", "SimSun",
+    "Noto Serif CJK SC", serif;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+
+  --shadow-paper:
+    0 0 0 1px rgb(28 25 21 / 0.06), 0 1px 2px rgb(28 25 21 / 0.04);
+  --shadow-paper-hover:
+    0 0 0 1px rgb(28 25 21 / 0.1), 0 2px 8px rgb(28 25 21 / 0.06);
+  --shadow-ink: 0 0 0 1px var(--color-fg);
+  --shadow-drop: 0 0 0 1.5px var(--color-accent);
+
+  --tracking-mark: 0.28em;
+
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --default-transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+
+  --width-node: 16rem;
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html,
+  body,
+  #app {
+    min-height: 100dvh;
+    background: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@layer utilities {
+  .paper-grain {
+    background-color: var(--color-bg);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.11  0 0 0 0 0.10  0 0 0 0 0.08  0 0 0 0.035 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  .animate-node-in {
+    animation: node-in var(--duration-fast) var(--ease-smooth) both;
+  }
+}
+
+@keyframes node-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

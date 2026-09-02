@@ -1,0 +1,8 @@
+{
+  "appId": "com.grok.li",
+  "appName": "理路",
+  "webDir": "dist/client",
+  "server": {
+    "androidScheme": "https"
+  }
+}
