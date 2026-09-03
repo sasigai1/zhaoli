@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>留白 · 日程</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<div class="phone" id="phone">
+  <!-- 状态栏（Android 风格） -->
+  <div class="statusbar">
+    <span id="sbTime">9:41</span>
+    <span class="sb-icons">
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="currentColor"><rect x="0" y="7" width="2.6" height="4" rx="0.8"/><rect x="4" y="5" width="2.6" height="6" rx="0.8"/><rect x="8" y="2.6" width="2.6" height="8.4" rx="0.8"/><rect x="12" y="0" width="2.6" height="11" rx="0.8" opacity=".35"/></svg>
+      <svg width="15" height="11" viewBox="0 0 24 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 13a14 14 0 0 1 20 0"/><path d="M6.5 17a8.5 8.5 0 0 1 11 0"/></svg>
+      <svg width="22" height="11" viewBox="0 0 26 12"><rect x="0.5" y="0.5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="14" height="8" rx="1.6" fill="currentColor"/><path d="M23.5 4v4a2.2 2.2 0 0 0 0-4z" fill="currentColor" opacity=".4"/></svg>
+    </span>
+  </div>
+
+  <!-- 主内容：四视图由 app.js 渲染 -->
+  <main id="main"></main>
+
+  <!-- 底部导航 -->
+  <nav class="tabbar" id="tabbar"></nav>
+
+  <!-- 快速添加 FAB（仅今日页显示） -->
+  <button class="fab" id="fab" aria-label="添加日程" title="添加日程"></button>
+
+  <!-- 事件详情 / 快速添加 弹层 -->
+  <div class="sheet-mask" id="sheetMask"></div>
+  <div class="sheet" id="sheet"></div>
+
+  <!-- 呼吸提醒 -->
+  <div class="breathe" id="breathe"></div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+</div>
+
+<script src="mock.js"></script>
+<script src="api.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
