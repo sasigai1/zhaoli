@@ -28,6 +28,12 @@
 }
 
 *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+/* 安全区变量：默认走 env()，App 内由原生 insets 覆盖注入（--safe-top/--safe-bottom） */
+:root{
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
 html,body{ height:100%; }
 body{
   font-family:var(--font-body);
@@ -61,7 +67,7 @@ main{
   position:relative; z-index:1;
   flex:1; overflow-y:auto; overflow-x:hidden;
   padding:24px 22px 120px;
-  padding-top:calc(24px + env(safe-area-inset-top, 0px));
+  padding-top:calc(24px + var(--safe-top));
   scrollbar-width:none;
 }
 main::-webkit-scrollbar{ display:none; }
@@ -69,7 +75,8 @@ main::-webkit-scrollbar{ display:none; }
 /* ============ 底部导航 ============ */
 .tabbar{
   position:relative; z-index:6; flex:0 0 auto;
-  height:76px; padding:0 14px 18px;
+  min-height:76px; height:auto;
+  padding:0 14px calc(14px + var(--safe-bottom));
   background:linear-gradient(to top, rgba(251,250,247,.98) 70%, rgba(251,250,247,.86));
   backdrop-filter:blur(10px);
   border-top:1px solid var(--line-soft);
@@ -243,7 +250,7 @@ main::-webkit-scrollbar{ display:none; }
 
 /* ============ FAB ============ */
 .fab{
-  position:absolute; z-index:20; right:20px; bottom:96px;
+  position:absolute; z-index:20; right:20px; bottom:calc(96px + var(--safe-bottom));
   width:54px; height:54px; border-radius:50%;
   background:var(--ink); color:#FBFAF7; border:none; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
@@ -264,7 +271,7 @@ main::-webkit-scrollbar{ display:none; }
   position:absolute; left:0; right:0; bottom:0; z-index:41;
   background:var(--paper);
   border-radius:26px 26px 0 0;
-  padding:14px 24px 34px;
+  padding:14px 24px calc(34px + var(--safe-bottom));
   transform:translateY(105%);
   transition:transform .38s var(--ease);
   max-height:78%; overflow-y:auto;
@@ -502,7 +509,7 @@ main::-webkit-scrollbar{ display:none; }
 
 /* ============ Toast ============ */
 .toast{
-  position:absolute; left:50%; bottom:110px; z-index:70;
+  position:absolute; left:50%; bottom:calc(110px + var(--safe-bottom)); z-index:70;
   transform:translate(-50%, 20px);
   background:var(--ink); color:#FBFAF7;
   font-size:12px; letter-spacing:2px;
