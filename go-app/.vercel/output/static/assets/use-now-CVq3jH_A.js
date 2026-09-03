@@ -1,0 +1,1 @@
+import{d as e,f as t}from"./index-BSU_BRsu.js";var n=t(e(),1);function r(e=1e3){let[t,r]=(0,n.useState)(()=>new Date);return(0,n.useEffect)(()=>{let t=window.setInterval(()=>r(new Date),e);return()=>window.clearInterval(t)},[e]),t}export{r as t};
