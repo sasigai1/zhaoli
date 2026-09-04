@@ -1,0 +1,7 @@
+#Fri Sep 04 11:41:39 UTC 2026
+base.0=/workspace/.uploads/schedule-disk/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
+base.1=/workspace/.uploads/schedule-disk/android/app/build/intermediates/dex/debug/mergeProjectDexDebug/13/classes.dex
+path.0=0/classes.dex
+path.1=13/classes.dex
+renamed.0=classes.dex
+renamed.1=classes2.dex
