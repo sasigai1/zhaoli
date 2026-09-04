@@ -1,0 +1,7 @@
+com.orbit.schedule.app-pngs-0 /workspace/schedule-disk/android/app/build/generated/res/pngs/release
+com.orbit.schedule.app-resValues-1 /workspace/schedule-disk/android/app/build/generated/res/resValues/release
+com.orbit.schedule.app-packageReleaseResources-2 /workspace/schedule-disk/android/app/build/intermediates/incremental/release/packageReleaseResources/merged.dir
+com.orbit.schedule.app-packageReleaseResources-3 /workspace/schedule-disk/android/app/build/intermediates/incremental/release/packageReleaseResources/stripped.dir
+com.orbit.schedule.app-release-4 /workspace/schedule-disk/android/app/build/intermediates/merged_res/release/mergeReleaseResources
+com.orbit.schedule.app-main-5 /workspace/schedule-disk/android/app/src/main/res
+com.orbit.schedule.app-release-6 /workspace/schedule-disk/android/app/src/release/res
