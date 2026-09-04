@@ -5,16 +5,20 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Base64;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowInsetsController;
@@ -25,6 +29,10 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.OutputStream;
@@ -40,10 +48,66 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupEdgeToEdge();
-        createNotificationChannel();
-        requestNotificationPermission();
 
+        // 全局崩溃捕获：崩溃堆栈写入 crash.log，下次启动显示报告
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            try {
+                java.io.File f = new java.io.File(getFilesDir(), "crash.log");
+                try (java.io.PrintWriter w = new java.io.PrintWriter(new java.io.FileWriter(f))) {
+                    w.println("=== 日程圆盘崩溃报告 ===");
+                    w.println("thread: " + t.getName());
+                    w.println("device: " + Build.MANUFACTURER + " " + Build.MODEL);
+                    w.println("android: " + Build.VERSION.RELEASE + " (API " + Build.VERSION.SDK_INT + ")");
+                    w.println("version: " + BuildConfig.VERSION_NAME + " (" + BuildConfig.VERSION_CODE + ")");
+                    w.println("time: " + new java.util.Date());
+                    w.println();
+                    e.printStackTrace(w);
+                }
+            } catch (Throwable ignored) { }
+            System.exit(2);
+        });
+
+        // 上次崩溃了？显示崩溃报告页
+        java.io.File crashLog = new java.io.File(getFilesDir(), "crash.log");
+        if (crashLog.exists()) {
+            showCrashReport(crashLog);
+            return;
+        }
+
+        try { setupEdgeToEdge(); } catch (Throwable t) { record(t, "setupEdgeToEdge"); }
+        try { createNotificationChannel(); } catch (Throwable t) { record(t, "createNotificationChannel"); }
+        try { requestNotificationPermission(); } catch (Throwable t) { record(t, "requestNotificationPermission"); }
+
+        try {
+            initWebView();
+        } catch (Throwable t) {
+            record(t, "initWebView");
+            showErrorScreen("WebView 初始化失败：\n\n" + stackOf(t));
+        }
+    }
+
+    /** 把非致命异常也记录到同一个日志文件 */
+    private void record(Throwable t, String where) {
+        try {
+            java.io.File f = new java.io.File(getFilesDir(), "crash.log");
+            try (java.io.PrintWriter w = new java.io.PrintWriter(new java.io.FileWriter(f))) {
+                w.println("=== 日程圆盘错误报告（非致命）===\n");
+                w.println("stage: " + where);
+                w.println("device: " + Build.MANUFACTURER + " " + Build.MODEL);
+                w.println("android: " + Build.VERSION.RELEASE + " (API " + Build.VERSION.SDK_INT + ")");
+                w.println();
+                t.printStackTrace(w);
+            }
+        } catch (Throwable ignored) { }
+    }
+
+    private static String stackOf(Throwable t) {
+        java.io.StringWriter sw = new java.io.StringWriter();
+        t.printStackTrace(new java.io.PrintWriter(sw));
+        return sw.toString();
+    }
+
+    private void initWebView() {
         webView = new WebView(this);
         WebSettings ws = webView.getSettings();
         ws.setJavaScriptEnabled(true);
@@ -159,27 +223,125 @@ public class MainActivity extends Activity {
         super.onDestroy();
     }
 
-    /** 供 Web 端调用的原生能力 */
+    /* ============================================================
+     * 崩溃报告 / 错误界面（纯原生，不依赖 WebView）
+     * ============================================================ */
+
+    private void showCrashReport(java.io.File log) {
+        String text;
+        try {
+            text = new String(java.nio.file.Files.readAllBytes(log.toPath()), "UTF-8");
+        } catch (Exception e) {
+            text = "无法读取崩溃日志: " + e;
+        }
+        final java.io.File logFile = log;
+        setContentView(buildReportView("应用上次启动时崩溃了", text, logFile, true));
+    }
+
+    private void showErrorScreen(String text) {
+        setContentView(buildReportView("出错了", text, null, false));
+    }
+
+    private View buildReportView(String title, String text, java.io.File logFile, boolean isCrash) {
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setBackgroundColor(0xFF14161A);
+        root.setFitsSystemWindows(true);
+
+        int pad = (int) (16 * getResources().getDisplayMetrics().density);
+
+        TextView tvTitle = new TextView(this);
+        tvTitle.setText(title);
+        tvTitle.setTextColor(0xFFFF6B6B);
+        tvTitle.setTextSize(18);
+        tvTitle.setTypeface(Typeface.DEFAULT_BOLD);
+        tvTitle.setPadding(pad, pad, pad, pad / 2);
+        root.addView(tvTitle);
+
+        TextView tvHint = new TextView(this);
+        tvHint.setText("请截图或复制以下内容反馈给开发者：");
+        tvHint.setTextColor(0xFFB0B4BC);
+        tvHint.setTextSize(13);
+        tvHint.setPadding(pad, 0, pad, pad / 2);
+        root.addView(tvHint);
+
+        ScrollView scroll = new ScrollView(this);
+        TextView tvLog = new TextView(this);
+        tvLog.setText(text);
+        tvLog.setTextColor(0xFFE6E6E6);
+        tvLog.setTextSize(12);
+        tvLog.setTypeface(Typeface.MONOSPACE);
+        tvLog.setPadding(pad, pad / 2, pad, pad / 2);
+        scroll.addView(tvLog);
+        LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(-1, 0, 1f);
+        root.addView(scroll, sp);
+
+        LinearLayout btnRow = new LinearLayout(this);
+        btnRow.setOrientation(LinearLayout.HORIZONTAL);
+        btnRow.setGravity(Gravity.CENTER);
+        btnRow.setPadding(pad, 0, pad, pad);
+
+        Button btnCopy = new Button(this);
+        btnCopy.setText(isCrash ? "复制报告并重启" : "复制详情");
+        btnCopy.setOnClickListener(v -> {
+            try {
+                ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(ClipData.newPlainText("crash", text));
+                Toast.makeText(this, "已复制", Toast.LENGTH_SHORT).show();
+            } catch (Throwable ignored) { }
+            if (isCrash) restartApp(logFile);
+        });
+        btnRow.addView(btnCopy, new LinearLayout.LayoutParams(0, -2, 1f));
+
+        if (isCrash) {
+            Button btnRetry = new Button(this);
+            btnRetry.setText("直接重启");
+            btnRetry.setOnClickListener(v -> restartApp(logFile));
+            LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(0, -2, 1f);
+            bp.leftMargin = pad / 2;
+            btnRow.addView(btnRetry, bp);
+        }
+        root.addView(btnRow, new LinearLayout.LayoutParams(-1, -2));
+
+        return root;
+    }
+
+    private void restartApp(java.io.File logFile) {
+        if (logFile != null) logFile.delete();
+        Intent i = new Intent(this, MainActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
+        finish();
+    }
+
+    /* ============================================================
+     * 供 Web 端调用的原生能力
+     * ============================================================ */
+
     public class Bridge {
 
         /** 系统通知（带系统默认提示音） */
         @JavascriptInterface
         public void notify(final String title, final String body) {
             runOnUiThread(() -> {
-                Intent tap = new Intent(MainActivity.this, MainActivity.class);
-                PendingIntent pi = PendingIntent.getActivity(MainActivity.this, 0, tap,
-                        PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-                Notification.Builder b = Build.VERSION.SDK_INT >= 26
-                        ? new Notification.Builder(MainActivity.this, CHANNEL_ID)
-                        : new Notification.Builder(MainActivity.this);
-                Notification n = b.setContentTitle(title)
-                        .setContentText(body)
-                        .setSmallIcon(R.drawable.ic_notification)
-                        .setContentIntent(pi)
-                        .setAutoCancel(true)
-                        .build();
-                NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                nm.notify((int) (System.currentTimeMillis() % 100000), n);
+                try {
+                    Intent tap = new Intent(MainActivity.this, MainActivity.class);
+                    PendingIntent pi = PendingIntent.getActivity(MainActivity.this, 0, tap,
+                            PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+                    Notification.Builder b = Build.VERSION.SDK_INT >= 26
+                            ? new Notification.Builder(MainActivity.this, CHANNEL_ID)
+                            : new Notification.Builder(MainActivity.this);
+                    Notification n = b.setContentTitle(title)
+                            .setContentText(body)
+                            .setSmallIcon(R.drawable.ic_notification)
+                            .setContentIntent(pi)
+                            .setAutoCancel(true)
+                            .build();
+                    NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    nm.notify((int) (System.currentTimeMillis() % 100000), n);
+                } catch (Throwable t) {
+                    Toast.makeText(MainActivity.this, "通知发送失败", Toast.LENGTH_SHORT).show();
+                }
             });
         }
 
