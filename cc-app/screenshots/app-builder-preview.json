@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "日晷 Sundial",
+      "hasCanvas": false,
+      "bodyTextLen": 121,
+      "bodyTextHash": "93a95e4683e1069990bac61c5c60271e7ecb1fa80927f061af5a8e21d9850274",
+      "bodyTextPrefix": "日晷 SUNDIAL 2026年 9月4日 9月 4 周五 · 4 01 今日 当天的安排 02 添加 一句话记下多件 03 月",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "日晷 Sundial",
+      "hasCanvas": false,
+      "bodyTextLen": 85,
+      "bodyTextHash": "3d779eb787096c743f250f764bc03b0e9ee578125d425dc6f117ff0b912eb21d",
+      "bodyTextPrefix": "日晷 SUNDIAL 2026年 9月4日 9月 4 周五 · 4 01 今日 02 添加 03 月历 04 日历 05 时间线",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

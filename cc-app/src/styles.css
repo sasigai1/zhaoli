@@ -1,0 +1,161 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #f3f0ea;
+  --color-paper: #fbf8f3;
+  --color-inset: #e8e3da;
+  --color-ink: #1c1b18;
+  --color-muted: #6f6b64;
+  --color-subtle: #9a958c;
+  --color-line: #ddd7cc;
+  --color-accent: #2a2825;
+  --color-accent-fg: #f7f3ec;
+  --color-ring: #c4bbae;
+  --color-good: #5f6f5a;
+  --color-warn: #8a6a44;
+  --color-danger: #8a4f46;
+  --color-bronze: #a89880;
+
+  --font-sans: "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Noto Sans",
+    ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Noto Serif SC", "Songti SC", "Noto Serif", ui-serif, serif;
+
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 28px;
+  --radius-2xl: 40px;
+
+  --shadow-card:
+    0px 0px 0px 1px rgba(28, 27, 24, 0.06), 0px 1px 2px -1px rgba(28, 27, 24, 0.06),
+    0px 2px 8px 0px rgba(28, 27, 24, 0.04);
+  --shadow-lift:
+    0px 0px 0px 1px rgba(28, 27, 24, 0.08), 0px 8px 24px -8px rgba(28, 27, 24, 0.12);
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html,
+  body {
+    min-height: 100dvh;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-ink) 12%, transparent);
+    color: var(--color-ink);
+  }
+}
+
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-quick: 150ms;
+  --motion-fast: 250ms;
+  --motion-slow: 400ms;
+}
+
+@keyframes sundial-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes gnomon-sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.sundial-spin {
+  transform-origin: center;
+  transform-box: view-box;
+  animation: sundial-spin 180s linear infinite;
+}
+
+.sundial-gnomon {
+  transform-origin: center;
+  transform-box: view-box;
+  animation: gnomon-sweep 86400s linear infinite;
+}
+
+.page-enter {
+  animation: page-enter var(--motion-slow) var(--ease-out) both;
+}
+
+.stagger-in > * {
+  animation: page-enter var(--motion-slow) var(--ease-out) both;
+}
+.stagger-in > *:nth-child(1) {
+  animation-delay: 0ms;
+}
+.stagger-in > *:nth-child(2) {
+  animation-delay: 40ms;
+}
+.stagger-in > *:nth-child(3) {
+  animation-delay: 80ms;
+}
+.stagger-in > *:nth-child(4) {
+  animation-delay: 120ms;
+}
+.stagger-in > *:nth-child(5) {
+  animation-delay: 160ms;
+}
+.stagger-in > *:nth-child(6) {
+  animation-delay: 200ms;
+}
+.stagger-in > *:nth-child(7) {
+  animation-delay: 240ms;
+}
+.stagger-in > *:nth-child(8) {
+  animation-delay: 280ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sundial-spin,
+  .sundial-gnomon,
+  .page-enter,
+  .stagger-in > * {
+    animation: none !important;
+    filter: none !important;
+    transform: none !important;
+  }
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
