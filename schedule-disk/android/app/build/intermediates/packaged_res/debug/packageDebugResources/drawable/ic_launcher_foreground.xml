@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 与 Web 端 icon.svg 同设计，按自适应图标安全区缩放至 85% -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 外环：雾蓝 -->
+    <path
+        android:pathData="M54,23.88 A30.12,30.12 0 0 1 62.45,82.92"
+        android:strokeColor="#5B7C99"
+        android:strokeWidth="5.38"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- 外环：紫 -->
+    <path
+        android:pathData="M55.36,84.09 A30.12,30.12 0 0 1 29.90,35.87"
+        android:strokeColor="#8E7CC3"
+        android:strokeWidth="5.38"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- 内环：鼠尾草绿 -->
+    <path
+        android:pathData="M54,32.84 A21.16,21.16 0 0 1 61.17,73.90"
+        android:strokeColor="#7A9B6E"
+        android:strokeWidth="5.38"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+    <!-- 内环：玫瑰 -->
+    <path
+        android:pathData="M54.73,75.13 A21.16,21.16 0 0 1 38.75,39.32"
+        android:strokeColor="#C97B84"
+        android:strokeWidth="5.38"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
+
+    <!-- 中心轮毂 -->
+    <path
+        android:pathData="M54,42.52 a11.48,11.48 0 1,1 0,22.96 a11.48,11.48 0 1,1 0,-22.96 Z"
+        android:fillColor="#FFFFFF"
+        android:strokeColor="#B08D57"
+        android:strokeWidth="1.26" />
+    <!-- 日 字 -->
+    <path
+        android:pathData="M48.98,49.36 H59.02 V59.38 H48.98 Z"
+        android:strokeColor="#22252A"
+        android:strokeWidth="1.44"
+        android:fillColor="#00000000" />
+    <path
+        android:pathData="M48.98,54.37 H59.02"
+        android:strokeColor="#22252A"
+        android:strokeWidth="1.44"
+        android:fillColor="#00000000" />
+</vector>

@@ -1,0 +1,7 @@
+com.orbit.schedule.app-pngs-0 /workspace/schedule-disk/android/app/build/generated/res/pngs/debug
+com.orbit.schedule.app-resValues-1 /workspace/schedule-disk/android/app/build/generated/res/resValues/debug
+com.orbit.schedule.app-packageDebugResources-2 /workspace/schedule-disk/android/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+com.orbit.schedule.app-packageDebugResources-3 /workspace/schedule-disk/android/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+com.orbit.schedule.app-debug-4 /workspace/schedule-disk/android/app/build/intermediates/merged_res/debug/mergeDebugResources
+com.orbit.schedule.app-debug-5 /workspace/schedule-disk/android/app/src/debug/res
+com.orbit.schedule.app-main-6 /workspace/schedule-disk/android/app/src/main/res

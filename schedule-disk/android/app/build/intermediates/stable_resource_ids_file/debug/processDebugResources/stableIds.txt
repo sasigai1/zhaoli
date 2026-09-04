@@ -1,0 +1,7 @@
+com.orbit.schedule:style/Theme.Orbit = 0x7f050000
+com.orbit.schedule:string/app_name = 0x7f040000
+com.orbit.schedule:mipmap/ic_launcher = 0x7f030000
+com.orbit.schedule:drawable/ic_notification = 0x7f020001
+com.orbit.schedule:drawable/ic_launcher_foreground = 0x7f020000
+com.orbit.schedule:color/ic_launcher_bg = 0x7f010001
+com.orbit.schedule:color/bg = 0x7f010000

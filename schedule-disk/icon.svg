@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="116" fill="#FBFAF7"/>
+  <rect x="6" y="6" width="500" height="500" rx="110" fill="none" stroke="#ECE9E2" stroke-width="2"/>
+  <!-- 外环两段 -->
+  <g transform="rotate(-90 256 256)">
+    <circle cx="256" cy="256" r="168" fill="none" stroke="#5B7C99" stroke-width="30"
+      stroke-dasharray="480 575.6" stroke-linecap="round"/>
+    <circle cx="256" cy="256" r="168" fill="none" stroke="#8E7CC3" stroke-width="30"
+      stroke-dasharray="380 675.6" stroke-dashoffset="-520" stroke-linecap="round"/>
+    <!-- 内环两段 -->
+    <circle cx="256" cy="256" r="118" fill="none" stroke="#7A9B6E" stroke-width="30"
+      stroke-dasharray="330 411.4" stroke-linecap="round"/>
+    <circle cx="256" cy="256" r="118" fill="none" stroke="#C97B84" stroke-width="30"
+      stroke-dasharray="280 461.4" stroke-dashoffset="-370" stroke-linecap="round"/>
+  </g>
+  <!-- 中心轮毂 -->
+  <circle cx="256" cy="256" r="64" fill="#FFFFFF" stroke="#B08D57" stroke-width="7"/>
+  <text x="256" y="280" text-anchor="middle" font-family="'Noto Serif SC','Songti SC',serif"
+    font-size="62" font-weight="700" fill="#22252A">日</text>
+</svg>
