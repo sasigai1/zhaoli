@@ -28,6 +28,8 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class MainActivity extends Activity {
 
@@ -40,11 +42,42 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 崩溃兜底：弹出原因而不是静默闪退，便于反馈定位
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            StringWriter sw = new StringWriter();
+            e.printStackTrace(new PrintWriter(sw));
+            String msg = sw.toString();
+            try {
+                new android.app.AlertDialog.Builder(this)
+                        .setTitle("应用出错")
+                        .setMessage(msg.length() > 800 ? msg.substring(0, 800) : msg)
+                        .setPositiveButton("退出", (d, w) -> {
+                            android.os.Process.killProcess(android.os.Process.myPid());
+                            System.exit(1);
+                        })
+                        .setCancelable(false)
+                        .show();
+            } catch (Exception ignored) {
+                android.os.Process.killProcess(android.os.Process.myPid());
+                System.exit(1);
+            }
+        });
         setupEdgeToEdge();
         createNotificationChannel();
         requestNotificationPermission();
 
-        webView = new WebView(this);
+        try {
+            webView = new WebView(this);
+        } catch (Throwable e) {
+            // 系统 WebView 缺失/被禁用/正在更新时，明确提示而非闪退
+            new android.app.AlertDialog.Builder(this)
+                    .setTitle("无法启动")
+                    .setMessage("系统 WebView 组件不可用，请在应用商店更新或启用「Android System WebView」后重试。\n\n" + e)
+                    .setPositiveButton("退出", (d, w) -> finish())
+                    .setCancelable(false)
+                    .show();
+            return;
+        }
         WebSettings ws = webView.getSettings();
         ws.setJavaScriptEnabled(true);
         ws.setDomStorageEnabled(true);               // localStorage 数据持久化
