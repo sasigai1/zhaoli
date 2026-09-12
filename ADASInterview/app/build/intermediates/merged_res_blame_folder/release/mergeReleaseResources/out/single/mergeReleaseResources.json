@@ -1,0 +1,62 @@
+[
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/drawable_ic_launcher_bg.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/drawable/ic_launcher_bg.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/drawable_bg_card.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/drawable/bg_card.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/layout_activity_question_detail.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/layout/activity_question_detail.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/drawable_ic_launcher_fg.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/drawable/ic_launcher_fg.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/layout_item_two_line.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/layout/item_two_line.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/layout_activity_question_list.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/layout/activity_question_list.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/layout_activity_guide.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/layout/activity_guide.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/drawable_bg_chip.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/drawable/bg_chip.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/layout_activity_detail.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/layout/activity_detail.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/layout_activity_list.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/layout/activity_list.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/layout_activity_mock.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/layout/activity_mock.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/layout_activity_stats.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/layout/activity_stats.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/layout_activity_quiz.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/layout/activity_quiz.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/layout_activity_main.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.adas.interviewprep.app-release-4:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.adas.interviewprep.app-main-5:/mipmap-anydpi-v26/ic_launcher.xml"
+    }
+]

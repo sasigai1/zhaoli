@@ -1,0 +1,67 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.adas.interviewprep"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="26"
+9        android:targetSdkVersion="35" />
+10
+11    <application
+11-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:4:5-25:19
+12        android:allowBackup="true"
+12-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:5:9-35
+13        android:extractNativeLibs="false"
+14        android:icon="@mipmap/ic_launcher"
+14-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:6:9-43
+15        android:label="@string/app_name"
+15-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:7:9-41
+16        android:supportsRtl="true"
+16-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:8:9-35
+17        android:theme="@style/Theme.ADASPrep" >
+17-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:9:9-46
+18        <activity
+18-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:11:9-16:20
+19            android:name="com.adas.interviewprep.MainActivity"
+19-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:11:19-47
+20            android:exported="true" >
+20-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:11:48-71
+21            <intent-filter>
+21-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:12:13-15:29
+22                <action android:name="android.intent.action.MAIN" />
+22-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:13:17-69
+22-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:13:25-66
+23
+24                <category android:name="android.intent.category.LAUNCHER" />
+24-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:14:17-77
+24-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:14:27-74
+25            </intent-filter>
+26        </activity>
+27        <activity android:name="com.adas.interviewprep.KnowledgeListActivity" />
+27-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:17:9-59
+27-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:17:19-56
+28        <activity android:name="com.adas.interviewprep.KnowledgeDetailActivity" />
+28-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:18:9-61
+28-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:18:19-58
+29        <activity android:name="com.adas.interviewprep.QuestionListActivity" />
+29-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:19:9-58
+29-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:19:19-55
+30        <activity android:name="com.adas.interviewprep.QuestionDetailActivity" />
+30-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:20:9-60
+30-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:20:19-57
+31        <activity android:name="com.adas.interviewprep.QuizActivity" />
+31-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:21:9-50
+31-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:21:19-47
+32        <activity android:name="com.adas.interviewprep.MockInterviewActivity" />
+32-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:22:9-59
+32-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:22:19-56
+33        <activity android:name="com.adas.interviewprep.GuideActivity" />
+33-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:23:9-51
+33-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:23:19-48
+34        <activity android:name="com.adas.interviewprep.StatsActivity" />
+34-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:24:9-51
+34-->/workspace/ADASInterview/app/src/main/AndroidManifest.xml:24:19-48
+35    </application>
+36
+37</manifest>

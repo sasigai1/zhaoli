@@ -1,0 +1,8 @@
+com.adas.interviewprep.app-pngs-0 /workspace/ADASInterview/app/build/generated/res/pngs/release
+com.adas.interviewprep.app-resValues-1 /workspace/ADASInterview/app/build/generated/res/resValues/release
+com.adas.interviewprep.app-updated_navigation_xml-2 /workspace/ADASInterview/app/build/generated/updated_navigation_xml/release
+com.adas.interviewprep.app-packageReleaseResources-3 /workspace/ADASInterview/app/build/intermediates/incremental/release/packageReleaseResources/merged.dir
+com.adas.interviewprep.app-packageReleaseResources-4 /workspace/ADASInterview/app/build/intermediates/incremental/release/packageReleaseResources/stripped.dir
+com.adas.interviewprep.app-release-5 /workspace/ADASInterview/app/build/intermediates/merged_res/release/mergeReleaseResources
+com.adas.interviewprep.app-main-6 /workspace/ADASInterview/app/src/main/res
+com.adas.interviewprep.app-release-7 /workspace/ADASInterview/app/src/release/res

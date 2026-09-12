@@ -1,0 +1,62 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.adas.interviewprep.app-release-4:/values_values.arsc.flat",
+            "map": [
+                {
+                    "source": "/workspace/ADASInterview/app/src/main/res/values/themes.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "7",
+                        "endColumns": "12",
+                        "endOffsets": "417"
+                    },
+                    "to": {
+                        "startLines": "14",
+                        "startColumns": "4",
+                        "startOffsets": "626",
+                        "endLines": "19",
+                        "endColumns": "12",
+                        "endOffsets": "988"
+                    }
+                },
+                {
+                    "source": "/workspace/ADASInterview/app/src/main/res/values/strings.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "44",
+                        "endOffsets": "95"
+                    },
+                    "to": {
+                        "startLines": "13",
+                        "startColumns": "4",
+                        "startOffsets": "581",
+                        "endColumns": "44",
+                        "endOffsets": "621"
+                    }
+                },
+                {
+                    "source": "/workspace/ADASInterview/app/src/main/res/values/colors.xml",
+                    "from": {
+                        "startLines": "5,6,7,9,8,3,4,2,12,10,11",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "198,241,290,387,340,102,146,55,537,437,486",
+                        "endColumns": "42,48,49,49,46,43,51,46,43,48,50",
+                        "endOffsets": "236,285,335,432,382,141,193,97,576,481,532"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,98,147,197,247,294,338,390,437,481,530",
+                        "endColumns": "42,48,49,49,46,43,51,46,43,48,50",
+                        "endOffsets": "93,142,192,242,289,333,385,432,476,525,576"
+                    }
+                }
+            ]
+        }
+    ]
+}
