@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>墨笺 · 记录此刻</title>
+<meta name="description" content="墨笺 — 一款 flomo 风格的卡片笔记，记录此刻的想法">
+<meta name="theme-color" content="#f6f5f1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2312a182'/%3E%3Cpath d='M20 44l3.5-10L38 19.5a3.6 3.6 0 0 1 5 5L28.5 40 20 44z' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <aside id="sidebar">
+    <div class="logo">
+      <div class="logo-mark"><span data-icon="feather"></span></div>
+      <div class="logo-text">
+        <div class="logo-name">墨笺</div>
+        <div class="logo-sub">记录此刻的想法</div>
+      </div>
+    </div>
+
+    <button class="btn-new" id="btn-new" type="button"><span data-icon="plus"></span>写一条 memo</button>
+
+    <nav class="nav" id="main-nav">
+      <button class="nav-item" data-view="memo" type="button"><span data-icon="pen"></span>我的记录<span class="nav-count" id="nav-count-memo">0</span></button>
+      <button class="nav-item" data-view="review" type="button"><span data-icon="shuffle"></span>随机回顾</button>
+      <button class="nav-item" data-view="stats" type="button"><span data-icon="chart"></span>统计</button>
+    </nav>
+
+    <div class="tags-section">
+      <div class="tags-header">标签</div>
+      <div class="tags-scroll"><div id="tag-list"></div></div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="footer-note">本地存储 · v1.0</div>
+      <button class="icon-btn" id="btn-settings" title="设置" type="button"><span data-icon="settings"></span></button>
+      <div id="settings-popover">
+        <button class="pop-item" id="btn-export" type="button"><span data-icon="download"></span>导出数据</button>
+        <button class="pop-item" id="btn-import" type="button"><span data-icon="upload"></span>导入数据</button>
+        <div class="pop-sep"></div>
+        <button class="pop-item danger" id="btn-clear" type="button"><span data-icon="trash"></span>清空数据</button>
+      </div>
+      <input type="file" id="file-import" accept=".json,application/json" hidden>
+    </div>
+  </aside>
+
+  <div id="drawer-overlay"></div>
+
+  <main id="main-col">
+    <header id="topbar">
+      <div class="topbar-inner">
+        <button class="icon-btn" id="btn-menu" title="菜单" type="button"><span data-icon="menu"></span></button>
+        <div class="topbar-title">
+          <h1 id="view-title">我的记录</h1>
+          <span id="view-sub"></span>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn" id="btn-exit-tag" title="返回全部记录" type="button" style="display:none"><span data-icon="x"></span></button>
+          <button class="icon-btn" id="btn-search-top" title="搜索 (Ctrl K)" type="button"><span data-icon="search"></span></button>
+          <button class="icon-btn" id="btn-theme-top" title="切换主题" type="button"></button>
+        </div>
+      </div>
+    </header>
+
+    <div id="view-container">
+
+      <!-- 记录视图 -->
+      <section class="view" id="view-memo">
+        <div class="view-wrap">
+          <div class="composer card">
+            <textarea id="composer-input" rows="3" spellcheck="false"
+              placeholder="记录此刻的想法…&#10;输入 # 可添加标签，如 #灵感"></textarea>
+            <div class="autocomplete" id="tag-autocomplete"></div>
+            <div class="composer-bar">
+              <div class="composer-left">
+                <button class="chip-btn" id="btn-tag" type="button"><span data-icon="hash"></span>标签</button>
+                <span class="char-count" id="char-count"></span>
+              </div>
+              <div class="composer-right">
+                <span class="shortcut-hint">Ctrl + Enter 保存</span>
+                <button class="btn-primary" id="btn-submit" type="button" disabled>记录</button>
+              </div>
+            </div>
+          </div>
+          <div id="pinned-section"></div>
+          <div id="timeline"></div>
+        </div>
+      </section>
+
+      <!-- 标签筛选视图 -->
+      <section class="view" id="view-tag">
+        <div class="view-wrap"><div id="tag-timeline"></div></div>
+      </section>
+
+      <!-- 搜索视图 -->
+      <section class="view" id="view-search">
+        <div class="view-wrap">
+          <div class="search-box">
+            <span class="search-ic" data-icon="search"></span>
+            <input id="search-input" type="text" placeholder="搜索正文与标签…" spellcheck="false">
+            <button class="icon-btn" id="btn-search-clear" type="button" style="display:none"><span data-icon="x"></span></button>
+          </div>
+          <div id="search-timeline"></div>
+        </div>
+      </section>
+
+      <!-- 随机回顾视图 -->
+      <section class="view" id="view-review">
+        <div class="view-wrap review-wrap"><div id="review-body"></div></div>
+      </section>
+
+      <!-- 统计视图 -->
+      <section class="view" id="view-stats">
+        <div class="view-wrap"><div id="stats-body"></div></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<div id="toast-stack"></div>
+<div id="modal-root"></div>
+<div id="hm-tooltip"></div>
+<noscript>墨笺需要启用 JavaScript 才能使用。</noscript>
+<script src="js/app.js"></script>
+</body>
+</html>
